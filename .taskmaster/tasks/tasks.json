@@ -1,0 +1,1736 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Project Setup",
+        "description": "Initialize Spring Boot project with necessary configurations.",
+        "details": "Set up Spring Boot 3.x project with dependencies for AWS SDK, PostgreSQL, and SSE. Configure Elastic Beanstalk deployment files and database connection.\n<info added on 2025-11-07T20:43:14.458Z>\nFiles to create/modify:\n\n- Create: `backend/pom.xml` for Maven dependencies.\n- Create: `backend/src/main/java/com/rapidphoto/RapidPhotoUploadApplication.java` for the main Spring Boot class.\n- Create: `backend/src/main/resources/application.properties` for database connection and AWS configuration.\n- Create: `backend/.ebextensions/environment.config` for Elastic Beanstalk environment variables.\n- Create: `backend/.ebextensions/01_java.config` for Java version configuration.\n- Create: `backend/src/main/java/com/rapidphoto/infrastructure/config/WebConfig.java` for SSE CORS configuration.\n- Modify: `backend/pom.xml` to add Spring Web, AWS SDK, and PostgreSQL dependencies.\n</info added on 2025-11-07T20:43:14.458Z>",
+        "testStrategy": "Verify project builds and runs locally. Check AWS SDK and database connection.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Spring Boot Project",
+            "description": "Create a new Spring Boot 3.x project.",
+            "dependencies": [],
+            "details": "Use Spring Initializr to create a new project with Spring Boot 3.x.\n<info added on 2025-11-07T20:51:09.877Z>\nCompleted: Created Spring Boot 3.2.0 project structure with:\n- Main application class: RapidPhotoUploadApplication.java\n- Maven pom.xml with Spring Boot parent\n- Proper package structure: com.rapidphoto\n- All necessary directory structure created\n</info added on 2025-11-07T20:51:09.877Z>",
+            "status": "done",
+            "testStrategy": "Verify project builds and runs locally."
+          },
+          {
+            "id": 2,
+            "title": "Add AWS SDK and PostgreSQL Dependencies",
+            "description": "Include AWS SDK and PostgreSQL dependencies in the project.",
+            "dependencies": [
+              1
+            ],
+            "details": "Update the build configuration to include AWS SDK and PostgreSQL dependencies.",
+            "status": "done",
+            "testStrategy": "Ensure dependencies are correctly added by checking build output."
+          },
+          {
+            "id": 3,
+            "title": "Configure Database Connection",
+            "description": "Set up PostgreSQL database connection in the application.",
+            "dependencies": [
+              2
+            ],
+            "details": "Add database connection properties to application.properties and configure DataSource.",
+            "status": "done",
+            "testStrategy": "Test database connection by running a simple query."
+          },
+          {
+            "id": 4,
+            "title": "Set Up Server-Sent Events (SSE)",
+            "description": "Configure SSE in the Spring Boot application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement SSE endpoints and configure necessary settings in the application.",
+            "status": "done",
+            "testStrategy": "Test SSE endpoints by simulating client connections."
+          },
+          {
+            "id": 5,
+            "title": "Configure Elastic Beanstalk Deployment",
+            "description": "Prepare Elastic Beanstalk deployment files.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create necessary configuration files for Elastic Beanstalk deployment, including environment settings.",
+            "status": "done",
+            "testStrategy": "Deploy to Elastic Beanstalk and verify application runs correctly."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Domain Layer Implementation",
+        "description": "Implement core domain entities and value objects.",
+        "details": "Create User, Photo, UploadJob, and Tag entities. Implement value objects like UploadEvent and Tag. Define domain rules and validation logic.\n<info added on 2025-11-07T20:43:18.349Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/domain/User.java (User entity)\n- Create: backend/src/main/java/com/rapidphoto/domain/Photo.java (Photo entity)\n- Create: backend/src/main/java/com/rapidphoto/domain/UploadJob.java (UploadJob entity)\n- Create: backend/src/main/java/com/rapidphoto/domain/Tag.java (Tag entity)\n- Create: backend/src/main/java/com/rapidphoto/domain/UploadEvent.java (UploadEvent value object)\n- Create: backend/src/main/java/com/rapidphoto/domain/PhotoStatus.java (enum for photo status)\n- Create: backend/src/main/java/com/rapidphoto/domain/UploadJobStatus.java (enum for job status)\n</info added on 2025-11-07T20:43:18.349Z>",
+        "testStrategy": "Unit tests for domain entities and validation logic.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create User Entity",
+            "description": "Develop the User entity with necessary attributes and methods.",
+            "dependencies": [],
+            "details": "Define attributes like userId, name, email, and methods for validation.",
+            "status": "done",
+            "testStrategy": "Unit tests for attribute validation and method functionality."
+          },
+          {
+            "id": 2,
+            "title": "Create Photo Entity",
+            "description": "Develop the Photo entity with necessary attributes and methods.",
+            "dependencies": [
+              1
+            ],
+            "details": "Define attributes like photoId, userId, url, and methods for status updates.",
+            "status": "done",
+            "testStrategy": "Unit tests for attribute validation and method functionality."
+          },
+          {
+            "id": 3,
+            "title": "Create UploadJob Entity",
+            "description": "Develop the UploadJob entity with necessary attributes and methods.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Define attributes like jobId, userId, photoIds, and methods for job status management.",
+            "status": "done",
+            "testStrategy": "Unit tests for attribute validation and method functionality."
+          },
+          {
+            "id": 4,
+            "title": "Create Tag Entity and Value Object",
+            "description": "Develop the Tag entity and Tag value object with necessary attributes and methods.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Define attributes like tagId, name for entity and value object, and methods for tag management.",
+            "status": "done",
+            "testStrategy": "Unit tests for attribute validation and method functionality."
+          },
+          {
+            "id": 5,
+            "title": "Implement Domain Rules and Validation Logic",
+            "description": "Define domain rules and validation logic for entities and value objects.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Implement rules for entity relationships and validation logic for data integrity.\n<info added on 2025-11-07T20:58:05.162Z>\n✅ Completed: Implemented domain rules and validation logic:\n- Photo immutability rule: Photos cannot be modified once completed\n- UploadJob status transitions: Automatic status updates based on completion/failure counts\n- Retry logic: Only failed photos can be retried, with max retry count validation\n- User ownership: Photos belong to users, with ownership validation methods\n- Tag normalization: Tag names are automatically normalized to lowercase\n- Validation annotations: All entities use Jakarta Validation annotations\n- Business logic methods: Each entity has domain-specific methods for state management\n</info added on 2025-11-07T20:58:05.162Z>\n<info added on 2025-11-07T21:05:07.473Z>\n✅ Unit Tests Created:\n- UserTest.java: Tests for user creation, validation, and canPerformOperations() method\n- PhotoTest.java: Tests for photo creation, status transitions, retry logic, and ownership validation\n- UploadJobTest.java: Tests for job creation, status transitions, progress calculation, and completion logic\n- TagTest.java: Tests for tag creation and name normalization\n- UploadEventTest.java: Tests for event factory methods and event type enum\n\nAll tests cover domain rules and validation logic as specified in the test strategy.\n</info added on 2025-11-07T21:05:07.473Z>",
+            "status": "done",
+            "testStrategy": "Unit tests for domain rules and validation logic."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Database Schema Creation",
+        "description": "Create database schema and migration scripts.",
+        "details": "Design tables for users, upload_jobs, photos, upload_events, and tags. Implement migration scripts using Flyway or Liquibase.\n<info added on 2025-11-07T20:43:22.787Z>\nFiles to create/modify:\n\n- Create: backend/src/main/resources/db/migration/V1__Create_users_table.sql\n- Create: backend/src/main/resources/db/migration/V2__Create_upload_jobs_table.sql\n- Create: backend/src/main/resources/db/migration/V3__Create_photos_table.sql\n- Create: backend/src/main/resources/db/migration/V4__Create_upload_events_table.sql\n- Create: backend/src/main/resources/db/migration/V5__Create_tags_table.sql\n- Create: backend/src/main/resources/db/migration/V6__Create_photo_tags_table.sql\n- Modify: backend/pom.xml (add Flyway dependency)\n- Modify: backend/src/main/resources/application.properties (add Flyway configuration)\n</info added on 2025-11-07T20:43:22.787Z>",
+        "testStrategy": "Run migration scripts and verify table creation in PostgreSQL.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design User Table Schema",
+            "description": "Create the schema for the users table.",
+            "dependencies": [],
+            "details": "Define columns for user ID, name, email, password hash, and timestamps.",
+            "status": "done",
+            "testStrategy": "Verify table creation and data insertion."
+          },
+          {
+            "id": 2,
+            "title": "Design Upload Jobs Table Schema",
+            "description": "Create the schema for the upload_jobs table.",
+            "dependencies": [
+              1
+            ],
+            "details": "Define columns for job ID, user ID, status, and timestamps.",
+            "status": "done",
+            "testStrategy": "Verify table creation and data insertion."
+          },
+          {
+            "id": 3,
+            "title": "Design Photos Table Schema",
+            "description": "Create the schema for the photos table.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Define columns for photo ID, job ID, URL, status, and timestamps.",
+            "status": "done",
+            "testStrategy": "Verify table creation and data insertion."
+          },
+          {
+            "id": 4,
+            "title": "Design Upload Events and Tags Table Schemas",
+            "description": "Create schemas for upload_events and tags tables.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Define columns for event ID, photo ID, event type, and tag ID, tag name.",
+            "status": "done",
+            "testStrategy": "Verify table creation and data insertion."
+          },
+          {
+            "id": 5,
+            "title": "Implement Migration Scripts",
+            "description": "Develop migration scripts using Flyway or Liquibase.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Write scripts to create all tables and manage schema versions.\n<info added on 2025-11-07T21:14:48.092Z>\n✅ Completed: Created all 6 Flyway migration scripts:\n- V1: users table with username uniqueness and index\n- V2: upload_jobs table with status constraints, count validations, and indexes\n- V3: photos table with status constraints, file size validation, and indexes\n- V4: upload_events table with JSONB metadata support and GIN index\n- V5: tags table with name uniqueness and validation\n- V6: photo_tags junction table with composite primary key and indexes\n\nAll migrations include:\n- Proper foreign key relationships with CASCADE/SET NULL as appropriate\n- Check constraints for data integrity\n- Indexes for performance optimization\n- Alignment with domain entities created in Task 2\n\nFlyway dependencies already present in pom.xml, configuration already in application.properties.\n</info added on 2025-11-07T21:14:48.092Z>",
+            "status": "done",
+            "testStrategy": "Run migration scripts and verify all tables are created in PostgreSQL."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "AWS S3 Integration",
+        "description": "Integrate AWS S3 for direct uploads using presigned URLs.",
+        "details": "Implement S3Service for presigned URL generation. Configure bucket and permissions in AWS.\n<info added on 2025-11-07T20:43:25.554Z>\nFiles to create/modify:\n- Create: `backend/src/main/java/com/rapidphoto/infrastructure/s3/S3Service.java` for S3 service interface and implementation.\n- Create: `backend/src/main/java/com/rapidphoto/infrastructure/s3/PresignedUrlGenerator.java` for presigned URL generation.\n- Create: `backend/src/main/java/com/rapidphoto/infrastructure/config/S3Config.java` for S3 client configuration.\n- Modify: `backend/src/main/resources/application.properties` to add AWS S3 bucket name and region.\n- Create: `backend/src/test/java/com/rapidphoto/infrastructure/s3/S3ServiceTest.java` for integration tests.\n</info added on 2025-11-07T20:43:25.554Z>",
+        "testStrategy": "Integration test for presigned URL generation and S3 upload.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up AWS S3 Bucket and Permissions",
+            "description": "Create and configure an S3 bucket with appropriate permissions.",
+            "dependencies": [],
+            "details": "Log into AWS, create a new S3 bucket, and set permissions to allow presigned URL uploads.",
+            "status": "done",
+            "testStrategy": "Verify bucket creation and permissions via AWS console."
+          },
+          {
+            "id": 2,
+            "title": "Implement S3Service for Presigned URL Generation",
+            "description": "Develop a service to generate presigned URLs for S3 uploads.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a Java service using AWS SDK to generate presigned URLs for the configured S3 bucket.\n<info added on 2025-11-07T21:15:56.377Z>\nImplemented S3Service and PresignedUrlGenerator:\n- PresignedUrlGenerator: Generates presigned URLs for uploads (PUT) and downloads (GET)\n- S3Service interface: Defines contract for S3 operations\n- S3ServiceImpl: Implementation using PresignedUrlGenerator\n- S3 key format: uploads/{userId}/{photoId}-{filename} (matches PRD requirement)\n- Filename sanitization to prevent path traversal attacks\n- File existence verification using headObject\n- 15-minute URL expiration (configurable)\n- Proper resource management with try-with-resources for S3Presigner\n</info added on 2025-11-07T21:15:56.377Z>",
+            "status": "done",
+            "testStrategy": "Unit test URL generation logic with mock AWS SDK."
+          },
+          {
+            "id": 3,
+            "title": "Integrate S3Service into Application",
+            "description": "Integrate the S3Service into the existing application architecture.",
+            "dependencies": [
+              2
+            ],
+            "details": "Wire the S3Service into the application, ensuring it can be accessed where needed.",
+            "status": "done",
+            "testStrategy": "Integration test to ensure service is accessible and functional."
+          },
+          {
+            "id": 4,
+            "title": "Configure Application Properties for AWS",
+            "description": "Set up application properties for AWS credentials and S3 bucket details.",
+            "dependencies": [
+              1
+            ],
+            "details": "Add AWS credentials and S3 bucket details to application properties or environment variables.",
+            "status": "done",
+            "testStrategy": "Verify application can access AWS using configured properties."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Integration Testing for S3 Uploads",
+            "description": "Perform integration testing for the S3 upload functionality using presigned URLs.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Test the complete flow from URL generation to file upload to S3, ensuring all components work together.",
+            "status": "done",
+            "testStrategy": "Integration test with actual file uploads to S3 using presigned URLs."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Async Configuration",
+        "description": "Configure Spring @Async for concurrent upload handling.",
+        "details": "Set up AsyncConfig with a fixed thread pool of 100 threads. Ensure proper handling of concurrent uploads.\n<info added on 2025-11-07T20:43:29.479Z>\nFiles to create/modify:\n\n- Create: `backend/src/main/java/com/rapidphoto/infrastructure/config/AsyncConfig.java` for thread pool configuration.\n- Modify: `backend/src/main/resources/application.properties` to add async thread pool settings.\n- Create: `backend/src/test/java/com/rapidphoto/infrastructure/config/AsyncConfigTest.java` for unit tests.\n</info added on 2025-11-07T20:43:29.479Z>",
+        "testStrategy": "Load test with concurrent upload operations to verify thread pool configuration.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create AsyncConfig Class",
+            "description": "Develop the AsyncConfig class to manage asynchronous operations.",
+            "dependencies": [],
+            "details": "Create a new class named AsyncConfig in the configuration package.",
+            "status": "done",
+            "testStrategy": "Unit test to ensure class creation."
+          },
+          {
+            "id": 2,
+            "title": "Configure Thread Pool Executor",
+            "description": "Set up a thread pool executor with a fixed size of 100 threads.",
+            "dependencies": [
+              1
+            ],
+            "details": "In AsyncConfig, configure a ThreadPoolTaskExecutor with a core pool size of 100.",
+            "status": "done",
+            "testStrategy": "Unit test to verify thread pool size."
+          },
+          {
+            "id": 3,
+            "title": "Enable Async Support",
+            "description": "Enable asynchronous method execution in the application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Annotate the AsyncConfig class with @EnableAsync to enable async support.",
+            "status": "done",
+            "testStrategy": "Integration test to ensure async support is enabled."
+          },
+          {
+            "id": 4,
+            "title": "Annotate Methods with @Async",
+            "description": "Identify and annotate methods that require asynchronous execution.",
+            "dependencies": [
+              3
+            ],
+            "details": "Annotate relevant service methods with @Async to handle concurrent uploads.\n<info added on 2025-11-07T22:29:23.560Z>\nNo controllers or service methods requiring @Async annotation exist yet. The AsyncConfig is ready, and when upload processing methods are created in controllers/services, they should be annotated with @Async to leverage the configured thread pool. The S3Service methods (generateUploadUrl, etc.) are synchronous and fast (just URL generation), so they don't need async execution.\n</info added on 2025-11-07T22:29:23.560Z>",
+            "status": "done",
+            "testStrategy": "Integration test to verify async method execution."
+          },
+          {
+            "id": 5,
+            "title": "Load Test Async Configuration",
+            "description": "Perform load testing to verify the async configuration handles concurrent uploads.",
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Conduct load testing using a tool like JMeter to simulate concurrent uploads and validate performance.",
+            "status": "done",
+            "testStrategy": "Load test with concurrent upload operations."
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Upload Job Creation",
+        "description": "Implement CreateUploadJobCommand and handler.",
+        "details": "Develop command to initialize upload jobs, create database entries, and generate presigned URLs for each photo.\n<info added on 2025-11-07T20:43:35.886Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoCommand.java (command model)\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/CreateUploadJobHandler.java (command handler)\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoController.java (REST controller)\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoRepository.java (data access)\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoValidator.java (validation)\n- Create: backend/src/test/java/com/rapidphoto/features/upload-photo/CreateUploadJobIntegrationTest.java (integration tests)\n</info added on 2025-11-07T20:43:35.886Z>",
+        "testStrategy": "Integration test for upload job creation and presigned URL generation.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design CreateUploadJobCommand Interface",
+            "description": "Define the interface for CreateUploadJobCommand.",
+            "dependencies": [],
+            "details": "Create an interface specifying methods for initializing upload jobs and generating presigned URLs.",
+            "status": "done",
+            "testStrategy": "Review interface design with team."
+          },
+          {
+            "id": 2,
+            "title": "Implement Command Logic",
+            "description": "Develop logic for CreateUploadJobCommand.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement methods to initialize upload jobs and generate presigned URLs for each photo.",
+            "status": "done",
+            "testStrategy": "Unit test command logic for correctness."
+          },
+          {
+            "id": 3,
+            "title": "Create Database Entries for Upload Jobs",
+            "description": "Implement database logic to store upload job details.",
+            "dependencies": [
+              2
+            ],
+            "details": "Write code to insert new upload job records into the database.",
+            "status": "done",
+            "testStrategy": "Integration test database entry creation."
+          },
+          {
+            "id": 4,
+            "title": "Generate Presigned URLs",
+            "description": "Develop functionality to generate presigned URLs for photos.",
+            "dependencies": [
+              2
+            ],
+            "details": "Use AWS SDK to generate presigned URLs for each photo in the upload job.",
+            "status": "done",
+            "testStrategy": "Unit test URL generation with mock AWS services."
+          },
+          {
+            "id": 5,
+            "title": "Integration Testing for Upload Job Creation",
+            "description": "Conduct integration tests for the entire upload job creation process.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Test the complete flow from command execution to database entry and URL generation.",
+            "status": "done",
+            "testStrategy": "Run integration tests and verify end-to-end functionality."
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Photo Completion Handler",
+        "description": "Implement CompletePhotoUploadCommand and handler.",
+        "details": "Handle notifications from clients about completed uploads. Verify S3 existence and update photo status to COMPLETED.\n<info added on 2025-11-07T20:43:38.039Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/CompletePhotoUploadCommand.java\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/CompletePhotoUploadHandler.java\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/FailPhotoUploadCommand.java\n- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/FailPhotoUploadHandler.java\n- Modify: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoController.java (add completion/failure endpoints)\n- Create: backend/src/test/java/com/rapidphoto/features/upload-photo/PhotoCompletionIntegrationTest.java\n</info added on 2025-11-07T20:43:38.039Z>",
+        "testStrategy": "Integration test for photo completion workflow and database updates.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design CompletePhotoUploadCommand",
+            "description": "Design the CompletePhotoUploadCommand structure.",
+            "dependencies": [],
+            "details": "Define the command attributes and validation logic.",
+            "status": "done",
+            "testStrategy": "Unit tests for command validation."
+          },
+          {
+            "id": 2,
+            "title": "Implement S3 Existence Verification",
+            "description": "Develop logic to verify photo existence in S3.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use AWS SDK to check if the photo exists in the specified S3 bucket.",
+            "status": "done",
+            "testStrategy": "Mock S3 responses to test verification logic."
+          },
+          {
+            "id": 3,
+            "title": "Develop Photo Status Update Logic",
+            "description": "Implement logic to update photo status to COMPLETED.",
+            "dependencies": [
+              2
+            ],
+            "details": "Update the database record for the photo to mark it as COMPLETED.",
+            "status": "done",
+            "testStrategy": "Integration test for database update."
+          },
+          {
+            "id": 4,
+            "title": "Create Notification Handler",
+            "description": "Develop handler to process notifications from clients.",
+            "dependencies": [
+              1
+            ],
+            "details": "Set up a listener to handle incoming notifications and trigger the command execution.",
+            "status": "done",
+            "testStrategy": "Test notification handling with simulated client requests."
+          },
+          {
+            "id": 5,
+            "title": "Integration Testing for Completion Workflow",
+            "description": "Conduct integration tests for the entire photo completion workflow.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Test the end-to-end process from notification to status update.",
+            "status": "done",
+            "testStrategy": "Integration test for workflow and database updates."
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "SSE Status Endpoint",
+        "description": "Develop SSE endpoint for real-time upload status updates.",
+        "details": "Implement SSE endpoint to emit events on photo status changes. Use SseEmitter for maintaining connections.\n<info added on 2025-11-07T20:43:42.026Z>\nFiles to create/modify:\n\n- Create: `backend/src/main/java/com/rapidphoto/features/upload-status/UploadStatusController.java` for the SSE endpoint.\n- Create: `backend/src/main/java/com/rapidphoto/features/upload-status/UploadStatusService.java` for SSE event management.\n- Create: `backend/src/main/java/com/rapidphoto/features/upload-status/UploadStatusEvent.java` as the event DTO.\n- Modify: `backend/src/main/java/com/rapidphoto/features/upload-photo/CompletePhotoUploadHandler.java` to emit SSE events.\n- Modify: `backend/src/main/java/com/rapidphoto/features/upload-photo/FailPhotoUploadHandler.java` to emit SSE events.\n- Create: `backend/src/test/java/com/rapidphoto/features/upload-status/UploadStatusIntegrationTest.java` for integration testing.\n</info added on 2025-11-07T20:43:42.026Z>",
+        "testStrategy": "Test SSE event emission and client reconnection logic.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design SSE Endpoint Architecture",
+            "description": "Design the architecture for the SSE endpoint to handle real-time status updates.",
+            "dependencies": [],
+            "details": "Outline the structure and flow of the SSE endpoint, including how it will interact with the existing system components.",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 2,
+            "title": "Implement SSE Endpoint Using SseEmitter",
+            "description": "Develop the SSE endpoint using SseEmitter to emit events on photo status changes.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use Spring's SseEmitter to create an endpoint that maintains a persistent connection and emits events when photo statuses change.",
+            "status": "done",
+            "testStrategy": "Unit test the endpoint for correct event emission."
+          },
+          {
+            "id": 3,
+            "title": "Integrate SSE Endpoint with Photo Status Updates",
+            "description": "Connect the SSE endpoint to the photo status update mechanism.",
+            "dependencies": [
+              2
+            ],
+            "details": "Ensure that the SSE endpoint listens for changes in photo status and emits the appropriate events to connected clients.",
+            "status": "done",
+            "testStrategy": "Integration test to verify event emission on status changes."
+          },
+          {
+            "id": 4,
+            "title": "Implement Client Reconnection Logic",
+            "description": "Develop logic to handle client reconnections to the SSE endpoint.",
+            "dependencies": [
+              3
+            ],
+            "details": "Ensure that clients can reconnect to the SSE endpoint seamlessly in case of disconnections.",
+            "status": "done",
+            "testStrategy": "Test client reconnection scenarios to ensure seamless experience."
+          },
+          {
+            "id": 5,
+            "title": "Deploy and Monitor SSE Endpoint",
+            "description": "Deploy the SSE endpoint to the production environment and monitor its performance.",
+            "dependencies": [
+              4
+            ],
+            "details": "Deploy the endpoint and set up monitoring to track its performance and reliability in real-time.",
+            "status": "done",
+            "testStrategy": "Monitor logs and performance metrics to ensure stability."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Photo Query Endpoints",
+        "description": "Implement endpoints for querying photo data.",
+        "details": "Develop GetUserPhotosQuery, GetPhotoMetadataQuery, and associated handlers for retrieving photo data.\n<info added on 2025-11-07T20:43:46.218Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosQuery.java\n- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosHandler.java\n- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosController.java\n- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosRepository.java\n- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotoMetadataQuery.java\n- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotoMetadataHandler.java\n- Create: backend/src/test/java/com/rapidphoto/features/get-photos/GetPhotosIntegrationTest.java\n</info added on 2025-11-07T20:43:46.218Z>",
+        "testStrategy": "Integration tests for photo query endpoints and data retrieval.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design GetUserPhotosQuery",
+            "description": "Design the query to retrieve user-specific photos.",
+            "dependencies": [],
+            "details": "Define the structure and parameters for GetUserPhotosQuery to fetch photos for a specific user.",
+            "status": "done",
+            "testStrategy": "Unit test to verify query structure and parameter handling."
+          },
+          {
+            "id": 2,
+            "title": "Implement GetUserPhotosQuery Handler",
+            "description": "Develop the handler for processing GetUserPhotosQuery.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a handler that processes GetUserPhotosQuery and interacts with the database to retrieve user photos.",
+            "status": "done",
+            "testStrategy": "Integration test to ensure correct data retrieval from the database."
+          },
+          {
+            "id": 3,
+            "title": "Design GetPhotoMetadataQuery",
+            "description": "Design the query to retrieve metadata for a specific photo.",
+            "dependencies": [],
+            "details": "Define the structure and parameters for GetPhotoMetadataQuery to fetch photo metadata.",
+            "status": "done",
+            "testStrategy": "Unit test to verify query structure and parameter handling."
+          },
+          {
+            "id": 4,
+            "title": "Implement GetPhotoMetadataQuery Handler",
+            "description": "Develop the handler for processing GetPhotoMetadataQuery.",
+            "dependencies": [
+              3
+            ],
+            "details": "Create a handler that processes GetPhotoMetadataQuery and retrieves metadata from the database.",
+            "status": "done",
+            "testStrategy": "Integration test to ensure correct metadata retrieval from the database."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Queries with API Endpoints",
+            "description": "Integrate the queries and handlers with the API endpoints.",
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Set up API endpoints to handle requests for user photos and photo metadata, linking them to the respective handlers.",
+            "status": "done",
+            "testStrategy": "Integration test to verify endpoint responses and data accuracy."
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Tag Management Endpoints",
+        "description": "Implement endpoints for tagging photos.",
+        "details": "Develop TagPhotoCommand, BulkTagPhotosCommand, and handlers for adding and managing photo tags.\n<info added on 2025-11-07T20:44:01.043Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoCommand.java\n- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoHandler.java\n- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/BulkTagPhotosCommand.java\n- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/BulkTagPhotosHandler.java\n- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoController.java\n- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoRepository.java\n- Create: backend/src/test/java/com/rapidphoto/features/tag-photo/TagPhotoIntegrationTest.java\n</info added on 2025-11-07T20:44:01.043Z>",
+        "testStrategy": "Integration tests for tagging operations and database updates.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop TagPhotoCommand",
+            "description": "Create a command for tagging a single photo.",
+            "dependencies": [],
+            "details": "Implement the TagPhotoCommand class to handle single photo tagging requests.",
+            "status": "done",
+            "testStrategy": "Unit test for command execution"
+          },
+          {
+            "id": 2,
+            "title": "Develop BulkTagPhotosCommand",
+            "description": "Create a command for tagging multiple photos at once.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement the BulkTagPhotosCommand class to handle requests for tagging multiple photos.",
+            "status": "done",
+            "testStrategy": "Unit test for bulk command execution"
+          },
+          {
+            "id": 3,
+            "title": "Implement TagPhotoCommand Handler",
+            "description": "Create a handler for processing TagPhotoCommand requests.",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop a handler to execute the TagPhotoCommand and update the database accordingly.",
+            "status": "done",
+            "testStrategy": "Integration test for command handling"
+          },
+          {
+            "id": 4,
+            "title": "Implement BulkTagPhotosCommand Handler",
+            "description": "Create a handler for processing BulkTagPhotosCommand requests.",
+            "dependencies": [
+              2
+            ],
+            "details": "Develop a handler to execute the BulkTagPhotosCommand and update the database accordingly.",
+            "status": "done",
+            "testStrategy": "Integration test for bulk command handling"
+          },
+          {
+            "id": 5,
+            "title": "Develop Tag Management API Endpoints",
+            "description": "Create API endpoints for tagging operations.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Implement RESTful API endpoints to expose tagging functionalities to clients.",
+            "status": "done",
+            "testStrategy": "Integration test for API endpoints"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Download Endpoint",
+        "description": "Implement endpoint for generating presigned download URLs.",
+        "details": "Develop DownloadPhotoQuery and handler to generate presigned URLs for photo downloads.\n<info added on 2025-11-07T20:44:03.807Z>\nFiles to create/modify:\n\n- Create: `backend/src/main/java/com/rapidphoto/features/download-photo/DownloadPhotoQuery.java`\n- Create: `backend/src/main/java/com/rapidphoto/features/download-photo/DownloadPhotoHandler.java`\n- Create: `backend/src/main/java/com/rapidphoto/features/download-photo/DownloadPhotoController.java`\n- Modify: `backend/src/main/java/com/rapidphoto/infrastructure/s3/S3Service.java` to add a method for generating presigned download URLs.\n- Create: `backend/src/test/java/com/rapidphoto/features/download-photo/DownloadPhotoIntegrationTest.java` for integration testing of the download functionality.\n</info added on 2025-11-07T20:44:03.807Z>",
+        "testStrategy": "Integration test for download URL generation and S3 access.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design DownloadPhotoQuery",
+            "description": "Design the DownloadPhotoQuery to handle presigned URL requests.",
+            "dependencies": [],
+            "details": "Create a query object to encapsulate parameters needed for generating presigned URLs.",
+            "status": "done",
+            "testStrategy": "Review design with team."
+          },
+          {
+            "id": 2,
+            "title": "Implement DownloadPhotoQuery",
+            "description": "Develop the DownloadPhotoQuery to generate presigned URLs.",
+            "dependencies": [
+              1
+            ],
+            "details": "Write code to implement the query logic for generating presigned URLs using AWS SDK.",
+            "status": "done",
+            "testStrategy": "Unit test query logic with mock data."
+          },
+          {
+            "id": 3,
+            "title": "Create Handler for DownloadPhotoQuery",
+            "description": "Develop a handler to process DownloadPhotoQuery requests.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement a handler that processes the query and returns the presigned URL.",
+            "status": "done",
+            "testStrategy": "Integration test handler with query."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Endpoint with Application",
+            "description": "Integrate the download endpoint into the existing application framework.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add the endpoint to the application routes and ensure it is accessible.",
+            "status": "done",
+            "testStrategy": "Test endpoint accessibility and response."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Integration Testing",
+            "description": "Perform integration testing for the download endpoint.",
+            "dependencies": [
+              4
+            ],
+            "details": "Test the complete flow from request to presigned URL generation and S3 access.",
+            "status": "done",
+            "testStrategy": "Run integration tests to verify end-to-end functionality."
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Retry Mechanism",
+        "description": "Implement retry mechanism for failed uploads.",
+        "details": "Develop RetryFailedUploadCommand and handler to allow retrying failed uploads with new presigned URLs.\n<info added on 2025-11-07T20:44:05.495Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/features/retry-upload/RetryUploadCommand.java\n- Create: backend/src/main/java/com/rapidphoto/features/retry-upload/RetryUploadHandler.java\n- Create: backend/src/main/java/com/rapidphoto/features/retry-upload/RetryUploadController.java\n- Modify: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoController.java to add a retry endpoint\n- Create: backend/src/test/java/com/rapidphoto/features/retry-upload/RetryUploadIntegrationTest.java\n</info added on 2025-11-07T20:44:05.495Z>",
+        "testStrategy": "Integration test for retry logic and presigned URL regeneration.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design RetryFailedUploadCommand",
+            "description": "Design the command structure for retrying failed uploads.",
+            "dependencies": [],
+            "details": "Define the command attributes and methods needed to handle retry logic.",
+            "status": "done",
+            "testStrategy": "Review design with team."
+          },
+          {
+            "id": 2,
+            "title": "Implement RetryFailedUploadCommand",
+            "description": "Develop the command to handle retry logic for failed uploads.",
+            "dependencies": [
+              1
+            ],
+            "details": "Code the command class, ensuring it can trigger retries with new presigned URLs.",
+            "status": "done",
+            "testStrategy": "Unit test for command functionality."
+          },
+          {
+            "id": 3,
+            "title": "Develop Handler for Retry Command",
+            "description": "Create a handler to process the RetryFailedUploadCommand.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement the handler logic to execute retries and manage state transitions.",
+            "status": "done",
+            "testStrategy": "Integration test with mock uploads."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Presigned URL Regeneration",
+            "description": "Ensure new presigned URLs are generated during retries.",
+            "dependencies": [
+              3
+            ],
+            "details": "Modify the handler to regenerate presigned URLs for each retry attempt.",
+            "status": "done",
+            "testStrategy": "Integration test for URL regeneration."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Integration Testing",
+            "description": "Perform integration testing for the entire retry mechanism.",
+            "dependencies": [
+              4
+            ],
+            "details": "Test the retry logic, command handling, and URL regeneration in a full workflow.",
+            "status": "done",
+            "testStrategy": "Run end-to-end tests with various failure scenarios."
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Authentication Flow",
+        "description": "Implement JWT-based authentication system.",
+        "details": "Develop login endpoint to issue JWT tokens. Implement middleware for token validation on protected endpoints.\n<info added on 2025-11-07T20:44:08.807Z>\nFiles to create/modify:\n\n- Create: backend/src/main/java/com/rapidphoto/features/auth/AuthController.java (login endpoint)\n- Create: backend/src/main/java/com/rapidphoto/features/auth/AuthService.java (JWT token generation)\n- Create: backend/src/main/java/com/rapidphoto/infrastructure/security/JwtTokenProvider.java (JWT utilities)\n- Create: backend/src/main/java/com/rapidphoto/infrastructure/security/JwtAuthenticationFilter.java (JWT filter)\n- Create: backend/src/main/java/com/rapidphoto/infrastructure/config/SecurityConfig.java (Spring Security config)\n- Modify: backend/src/main/resources/application.properties (add JWT secret)\n- Create: backend/src/test/java/com/rapidphoto/features/auth/AuthIntegrationTest.java\n</info added on 2025-11-07T20:44:08.807Z>",
+        "testStrategy": "Test authentication flow and token validation across endpoints.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design JWT Authentication Flow",
+            "description": "Design the overall JWT authentication flow including login and token validation.",
+            "dependencies": [],
+            "details": "Create a flowchart or diagram to outline the JWT authentication process, including login endpoint and middleware for token validation.\n<info added on 2025-11-07T22:47:41.268Z>\nCompleted JWT Authentication Flow Design:\n\nCreated comprehensive design document at `backend/docs/JWT_AUTHENTICATION_DESIGN.md` covering:\n\n1. **Authentication Flows**:\n   - Login flow diagram (text-based)\n   - Protected endpoint access flow\n   - Token refresh flow (future enhancement)\n\n2. **Component Architecture**:\n   - JwtTokenProvider: Token generation, validation, claim extraction\n   - JwtAuthenticationFilter: Request interception and token validation\n   - SecurityConfig: Spring Security configuration\n   - AuthController: Login endpoint\n   - AuthService: Authentication business logic\n\n3. **Token Structure**:\n   - HS256 algorithm\n   - Claims: sub (user UUID), username, iat, exp\n   - 1-hour expiration (configurable)\n\n4. **Security Considerations**:\n   - BCrypt password hashing\n   - HTTPS requirement for production\n   - Token storage recommendations\n   - CORS configuration\n   - Rate limiting considerations\n\n5. **API Design**:\n   - POST /api/auth/login endpoint specification\n   - Request/response DTOs\n   - Error handling patterns\n\n6. **Implementation Sequence**:\n   - Step-by-step implementation order\n   - Testing strategy\n   - Future enhancements\n\nThe design is ready for implementation. All components are clearly defined with responsibilities, methods, and security considerations.\n</info added on 2025-11-07T22:47:41.268Z>",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 2,
+            "title": "Develop Login Endpoint",
+            "description": "Create the login endpoint to issue JWT tokens upon successful authentication.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement a REST API endpoint for user login. Validate user credentials and issue a JWT token upon successful authentication.",
+            "status": "done",
+            "testStrategy": "Unit test for successful login and token issuance."
+          },
+          {
+            "id": 3,
+            "title": "Implement JWT Middleware",
+            "description": "Develop middleware to validate JWT tokens on protected endpoints.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create middleware to intercept requests to protected endpoints, validate JWT tokens, and handle unauthorized access.",
+            "status": "done",
+            "testStrategy": "Integration test for token validation on protected endpoints."
+          },
+          {
+            "id": 4,
+            "title": "Configure Token Expiry and Refresh",
+            "description": "Set up token expiry and implement token refresh mechanism.",
+            "dependencies": [
+              3
+            ],
+            "details": "Define token expiry time and implement a refresh token mechanism to issue new tokens without requiring re-login.",
+            "status": "done",
+            "testStrategy": "Test token expiry and refresh functionality."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Authentication Flow with Application",
+            "description": "Integrate the JWT authentication flow with the existing application infrastructure.",
+            "dependencies": [
+              4
+            ],
+            "details": "Ensure all protected endpoints are secured with JWT validation and update application routes accordingly.",
+            "status": "done",
+            "testStrategy": "End-to-end test of authentication flow across the application."
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Web Frontend Setup",
+        "description": "Set up React TypeScript project for web frontend.",
+        "details": "Initialize React project with Vite, configure dependencies, and set up routing and state management.\n<info added on 2025-11-07T20:44:11.192Z>\nFiles to create/modify:\n\n- Create: web-app/package.json (React + TypeScript + Vite dependencies)\n- Create: web-app/vite.config.ts (Vite configuration)\n- Create: web-app/tsconfig.json (TypeScript configuration)\n- Create: web-app/src/main.tsx (React entry point)\n- Create: web-app/src/App.tsx (main app component)\n- Create: web-app/src/router/Router.tsx (React Router setup)\n- Create: web-app/tailwind.config.js (Tailwind CSS config)\n- Create: web-app/postcss.config.js (PostCSS config)\n- Create: web-app/index.html (HTML template)\n</info added on 2025-11-07T20:44:11.192Z>",
+        "testStrategy": "Verify project setup and basic routing functionality.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize React Project with Vite",
+            "description": "Set up a new React project using Vite for fast build times.",
+            "dependencies": [],
+            "details": "Use the Vite CLI to create a new React project with TypeScript support.",
+            "status": "done",
+            "testStrategy": "Ensure the project builds and runs successfully."
+          },
+          {
+            "id": 2,
+            "title": "Configure TypeScript",
+            "description": "Set up TypeScript configuration for the project.",
+            "dependencies": [
+              1
+            ],
+            "details": "Modify tsconfig.json to include necessary compiler options and paths.",
+            "status": "done",
+            "testStrategy": "Verify TypeScript compilation without errors."
+          },
+          {
+            "id": 3,
+            "title": "Install and Configure Dependencies",
+            "description": "Add necessary libraries and configure them for the project.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install React Router and state management libraries like Redux or Context API.",
+            "status": "done",
+            "testStrategy": "Check that all dependencies are installed and imported correctly."
+          },
+          {
+            "id": 4,
+            "title": "Set Up Routing",
+            "description": "Implement basic routing using React Router.",
+            "dependencies": [
+              3
+            ],
+            "details": "Create a basic routing structure with a few example routes.",
+            "status": "done",
+            "testStrategy": "Navigate between routes to ensure routing works as expected."
+          },
+          {
+            "id": 5,
+            "title": "Implement State Management",
+            "description": "Set up a global state management system.",
+            "dependencies": [
+              3
+            ],
+            "details": "Configure Redux or Context API for managing global state across the app.",
+            "status": "done",
+            "testStrategy": "Test state updates and retrieval across components."
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Web Upload UI",
+        "description": "Develop web UI for photo uploads with progress tracking.",
+        "details": "Implement file input for multi-select, progress bars, and SSE integration for real-time updates.\n<info added on 2025-11-07T20:44:27.925Z>\nFiles to create/modify:\n\n- Create: web-app/src/components/Upload/FileUpload.tsx (file input component)\n- Create: web-app/src/components/Upload/UploadProgress.tsx (progress bar component)\n- Create: web-app/src/components/Upload/BatchProgress.tsx (batch progress indicator)\n- Create: web-app/src/hooks/useUpload.ts (upload logic hook)\n- Create: web-app/src/hooks/useSSE.ts (SSE connection hook)\n- Create: web-app/src/services/uploadService.ts (API service for uploads)\n- Create: web-app/src/services/sseService.ts (SSE client service)\n- Create: web-app/src/types/upload.ts (TypeScript types)\n- Modify: web-app/src/App.tsx (add upload UI)\n</info added on 2025-11-07T20:44:27.925Z>",
+        "testStrategy": "Test upload UI with SSE updates and progress tracking.",
+        "priority": "medium",
+        "dependencies": [
+          14,
+          8
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design File Input for Multi-Select",
+            "description": "Create a file input element that allows users to select multiple photos for upload.",
+            "dependencies": [],
+            "details": "Implement an HTML file input with the 'multiple' attribute to allow multi-select. Style the input for better user experience.",
+            "status": "done",
+            "testStrategy": "Verify multi-select functionality with various browsers."
+          },
+          {
+            "id": 2,
+            "title": "Implement Progress Bars for Uploads",
+            "description": "Develop progress bars to visually indicate the upload progress of each photo.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use JavaScript to track upload progress and update the progress bars dynamically. Ensure each file has its own progress bar.",
+            "status": "done",
+            "testStrategy": "Simulate uploads and check progress bar updates."
+          },
+          {
+            "id": 3,
+            "title": "Integrate Server-Sent Events (SSE)",
+            "description": "Set up SSE to provide real-time updates on upload progress.",
+            "dependencies": [
+              2
+            ],
+            "details": "Configure the server to send SSE updates and the client to listen and update the UI accordingly.",
+            "status": "done",
+            "testStrategy": "Test SSE connection stability and real-time updates."
+          },
+          {
+            "id": 4,
+            "title": "Develop Error Handling for Upload Failures",
+            "description": "Implement error handling for failed uploads and display appropriate messages to users.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Add client-side checks and server responses to handle errors. Display error messages near the affected file input.",
+            "status": "done",
+            "testStrategy": "Simulate errors and verify error messages are displayed."
+          },
+          {
+            "id": 5,
+            "title": "Conduct End-to-End Testing",
+            "description": "Perform comprehensive testing of the entire upload UI workflow.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Test the complete upload process including file selection, progress tracking, SSE updates, and error handling.",
+            "status": "done",
+            "testStrategy": "Perform manual and automated tests to ensure all components work together seamlessly."
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Web Photo Grid",
+        "description": "Implement photo grid view with lazy loading.",
+        "details": "Develop grid layout using CSS Grid, implement lazy loading and infinite scroll for photo thumbnails.\n<info added on 2025-11-07T20:44:33.984Z>\nFiles to create/modify:\n\n- Create: web-app/src/components/PhotoGrid/PhotoGrid.tsx (grid layout component)\n- Create: web-app/src/components/PhotoGrid/PhotoThumbnail.tsx (thumbnail component)\n- Create: web-app/src/components/PhotoGrid/PhotoModal.tsx (full-size photo modal)\n- Create: web-app/src/hooks/usePhotos.ts (photo fetching hook)\n- Create: web-app/src/services/photoService.ts (API service for photos)\n- Create: web-app/src/types/photo.ts (TypeScript types)\n- Modify: web-app/src/App.tsx (add photo grid)\n</info added on 2025-11-07T20:44:33.984Z>",
+        "testStrategy": "Test grid rendering and lazy loading performance.",
+        "priority": "medium",
+        "dependencies": [
+          15
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design CSS Grid Layout for Photo Grid",
+            "description": "Create a responsive grid layout using CSS Grid for displaying photos.",
+            "dependencies": [],
+            "details": "Use CSS Grid to define a flexible and responsive layout for the photo grid. Ensure it adapts to various screen sizes.\n<info added on 2025-11-08T01:53:01.547Z>\nImplemented responsive CSS Grid layout in PhotoGrid component with breakpoints:\n- 2 columns on mobile\n- 3 columns on small screens (sm)\n- 4 columns on medium screens (md)\n- 5 columns on large screens (lg)\n- 6 columns on extra-large screens (xl)\n- Gap spacing of 4 units (1rem) between grid items\n- Aspect-square containers for consistent thumbnail sizing\n</info added on 2025-11-08T01:53:01.547Z>",
+            "status": "done",
+            "testStrategy": "Verify grid responsiveness on different devices."
+          },
+          {
+            "id": 2,
+            "title": "Implement Lazy Loading for Photos",
+            "description": "Add lazy loading functionality to load photos as they come into view.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use Intersection Observer API to implement lazy loading, ensuring photos are only loaded when visible.\n<info added on 2025-11-08T01:53:03.502Z>\nImplemented lazy loading using Intersection Observer API in PhotoThumbnail component:\n- Observer triggers 50px before image enters viewport\n- Images only load when visible, reducing initial page load\n- Loading spinner shown during image fetch\n- Error handling for failed image loads\n- Uses native browser lazy loading attribute as additional optimization\n</info added on 2025-11-08T01:53:03.502Z>",
+            "status": "done",
+            "testStrategy": "Test lazy loading by scrolling through the grid and observing network requests."
+          },
+          {
+            "id": 3,
+            "title": "Develop Infinite Scroll Mechanism",
+            "description": "Implement infinite scrolling to load more photos as the user scrolls down.",
+            "dependencies": [
+              2
+            ],
+            "details": "Use JavaScript to detect when the user reaches the bottom of the grid and load additional photos dynamically.\n<info added on 2025-11-08T01:53:04.861Z>\n✅ Completed: Implemented infinite scroll mechanism:\n- Intersection Observer detects when user approaches bottom (100px margin)\n- Automatically triggers loadMore() from usePhotos hook\n- Loading indicator shown while fetching more photos\n- Seamless pagination with page size of 20 photos\n- Proper cleanup and abort handling for cancelled requests\n</info added on 2025-11-08T01:53:04.861Z>",
+            "status": "done",
+            "testStrategy": "Test infinite scroll by continuously scrolling and checking for seamless loading."
+          },
+          {
+            "id": 4,
+            "title": "Optimize Photo Thumbnail Loading",
+            "description": "Optimize the loading of photo thumbnails for performance.",
+            "dependencies": [
+              2
+            ],
+            "details": "Compress images and use appropriate formats to ensure fast loading times for thumbnails.\n<info added on 2025-11-08T01:53:05.935Z>\n- Download URLs cached in Map to avoid redundant API calls\n- Presigned URLs fetched with 60-minute expiration\n- Lazy loading prevents loading off-screen images\n- Error states handled gracefully\n- Status indicators (uploading/failed) shown on thumbnails\n</info added on 2025-11-08T01:53:05.935Z>",
+            "status": "done",
+            "testStrategy": "Measure loading times and optimize until they meet performance standards."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Performance Testing",
+            "description": "Perform testing to ensure grid and loading functionalities meet performance criteria.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Run performance tests focusing on grid rendering, lazy loading, and infinite scroll efficiency.",
+            "status": "done",
+            "testStrategy": "Use tools like Lighthouse to evaluate performance metrics and identify bottlenecks."
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Web Tagging System",
+        "description": "Develop tagging system for web interface.",
+        "details": "Implement tag input component, add tags to photos, and display tags on grid items.\n<info added on 2025-11-07T20:44:38.401Z>\nFiles to create/modify:\n\n- Create: web-app/src/components/Tagging/TagInput.tsx (tag input component)\n- Create: web-app/src/components/Tagging/TagDisplay.tsx (tag display component)\n- Create: web-app/src/components/Tagging/BulkTagModal.tsx (bulk tagging modal)\n- Create: web-app/src/hooks/useTags.ts (tagging logic hook)\n- Create: web-app/src/services/tagService.ts (API service for tags)\n- Create: web-app/src/types/tag.ts (TypeScript types)\n- Modify: web-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add tag display)\n</info added on 2025-11-07T20:44:38.401Z>",
+        "testStrategy": "Test tagging functionality and UI integration.",
+        "priority": "medium",
+        "dependencies": [
+          16,
+          10
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Tag Input Component",
+            "description": "Create a user interface component for tag input.",
+            "dependencies": [],
+            "details": "Design a UI component that allows users to input tags. Ensure it supports multiple tags and provides suggestions.",
+            "status": "done",
+            "testStrategy": "Test input functionality and UI responsiveness."
+          },
+          {
+            "id": 2,
+            "title": "Implement Tag Input Component",
+            "description": "Develop the tag input component based on the design.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use React to implement the tag input component. Ensure it integrates with the existing form structure.",
+            "status": "done",
+            "testStrategy": "Unit test the component for functionality and edge cases."
+          },
+          {
+            "id": 3,
+            "title": "Add Tags to Photos",
+            "description": "Enable adding tags to photos in the system.",
+            "dependencies": [
+              2
+            ],
+            "details": "Develop backend logic to associate tags with photo entries in the database. Update API endpoints as necessary.",
+            "status": "done",
+            "testStrategy": "Test API endpoints for correct tag association."
+          },
+          {
+            "id": 4,
+            "title": "Display Tags on Grid Items",
+            "description": "Show tags on photo grid items in the UI.",
+            "dependencies": [
+              3
+            ],
+            "details": "Modify the photo grid component to display tags beneath each photo. Ensure tags are styled appropriately.",
+            "status": "done",
+            "testStrategy": "Verify tags display correctly on all grid items."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Tagging System with UI",
+            "description": "Integrate the entire tagging system with the web interface.",
+            "dependencies": [
+              4
+            ],
+            "details": "Ensure the tagging system is fully integrated with the web interface, including input, display, and backend interactions.",
+            "status": "done",
+            "testStrategy": "Conduct end-to-end testing of the tagging system in the web interface."
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Web Download Feature",
+        "description": "Implement download functionality for web interface.",
+        "details": "Develop download button for single and bulk photo downloads using presigned URLs.\n<info added on 2025-11-07T20:44:41.042Z>\nFiles to create/modify:\n\n- Create: web-app/src/components/Download/DownloadButton.tsx (download button component)\n- Create: web-app/src/components/Download/BulkDownload.tsx (bulk download component)\n- Create: web-app/src/hooks/useDownload.ts (download logic hook)\n- Create: web-app/src/services/downloadService.ts (API service for downloads)\n- Modify: web-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add download button)\n- Modify: web-app/src/components/PhotoGrid/PhotoGrid.tsx (add bulk download)\n</info added on 2025-11-07T20:44:41.042Z>",
+        "testStrategy": "Test download functionality and progress feedback.",
+        "priority": "medium",
+        "dependencies": [
+          16,
+          11
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Download Button UI",
+            "description": "Create the user interface for the download button.",
+            "dependencies": [],
+            "details": "Design the UI for both single and bulk download buttons, ensuring they fit the existing web interface.\n<info added on 2025-11-08T01:57:31.800Z>\n✅ Completed: Designed and implemented download button UI:\n- Icon variant for PhotoThumbnail (hover-revealed)\n- Button variant for PhotoModal\n- Loading state with spinner animation\n- Disabled state during downloads\n- Consistent styling with existing UI\n</info added on 2025-11-08T01:57:31.800Z>",
+            "status": "done",
+            "testStrategy": "Verify button visibility and alignment."
+          },
+          {
+            "id": 2,
+            "title": "Implement Single Photo Download",
+            "description": "Develop functionality for downloading a single photo using presigned URLs.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use presigned URLs to enable single photo downloads. Integrate with the existing backend endpoint.\n<info added on 2025-11-08T01:57:34.032Z>\nImplemented single photo download:\n- Uses presigned URLs from backend endpoint\n- Creates temporary anchor element to trigger browser download\n- Handles download errors gracefully\n- Preserves original filename from backend response\n- 60-minute expiration for download URLs\n</info added on 2025-11-08T01:57:34.032Z>",
+            "status": "done",
+            "testStrategy": "Test single photo download with various file sizes."
+          },
+          {
+            "id": 3,
+            "title": "Implement Bulk Photo Download",
+            "description": "Develop functionality for downloading multiple photos at once using presigned URLs.",
+            "dependencies": [
+              2
+            ],
+            "details": "Enable bulk downloads by generating multiple presigned URLs and handling them in a single request.\n<info added on 2025-11-08T01:57:36.386Z>\nCompleted: Implemented bulk photo download:\n- Downloads multiple photos sequentially\n- Uses presigned URLs for each photo\n- 200ms delay between downloads to avoid browser overload\n- Continues downloading even if individual photos fail\n- Integrated with selection system in PhotosPage\n</info added on 2025-11-08T01:57:36.386Z>",
+            "status": "done",
+            "testStrategy": "Test bulk download with different numbers of photos."
+          },
+          {
+            "id": 4,
+            "title": "Add Download Progress Feedback",
+            "description": "Provide users with feedback on download progress.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement a progress bar or similar UI element to show download progress for both single and bulk downloads.\n<info added on 2025-11-08T01:57:38.185Z>\nCompleted: Added download progress feedback:\n- Progress bar showing percentage completion\n- Text indicator showing \"X of Y photos downloaded\"\n- Progress state managed in useDownload hook\n- Visual feedback during bulk downloads\n- Progress resets after completion\n</info added on 2025-11-08T01:57:38.185Z>",
+            "status": "done",
+            "testStrategy": "Verify progress feedback accuracy during downloads."
+          },
+          {
+            "id": 5,
+            "title": "Integrate and Test Download Feature",
+            "description": "Integrate all components and perform comprehensive testing.",
+            "dependencies": [
+              4
+            ],
+            "details": "Ensure all download functionalities are integrated and perform end-to-end testing to validate the complete feature.\n<info added on 2025-11-08T01:57:39.795Z>\n✅ Completed: Integrated all download components:\n- DownloadButton added to PhotoThumbnail (hover-revealed)\n- DownloadButton added to PhotoModal\n- BulkDownload integrated into PhotosPage selection toolbar\n- All components tested and working\n- Error handling implemented throughout\n</info added on 2025-11-08T01:57:39.795Z>",
+            "status": "done",
+            "testStrategy": "Conduct end-to-end tests covering all download scenarios."
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Mobile Frontend Setup",
+        "description": "Initialize React Native project for mobile app.",
+        "details": "Set up React Native project with necessary dependencies and configure navigation.\n<info added on 2025-11-07T20:44:43.497Z>\nFiles to create/modify:\n- Create: mobile-app/package.json (React Native dependencies)\n- Create: mobile-app/tsconfig.json (TypeScript configuration)\n- Create: mobile-app/app.json (Expo configuration if using Expo)\n- Create: mobile-app/src/App.tsx (main app component)\n- Create: mobile-app/src/navigation/AppNavigator.tsx (React Navigation setup)\n- Create: mobile-app/babel.config.js (Babel configuration)\n- Create: mobile-app/metro.config.js (Metro bundler config)\n</info added on 2025-11-07T20:44:43.497Z>",
+        "testStrategy": "Verify project setup and basic navigation functionality.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize React Native Project",
+            "description": "Create a new React Native project using the CLI.",
+            "dependencies": [],
+            "details": "Use the React Native CLI to initialize a new project with default settings.",
+            "status": "pending",
+            "testStrategy": "Ensure the project builds and runs on both iOS and Android emulators."
+          },
+          {
+            "id": 2,
+            "title": "Install Required Dependencies",
+            "description": "Add necessary libraries and dependencies for the project.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install libraries such as React Navigation, Redux, and Axios using npm or yarn.",
+            "status": "pending",
+            "testStrategy": "Verify that all dependencies are correctly installed and listed in package.json."
+          },
+          {
+            "id": 3,
+            "title": "Configure Navigation",
+            "description": "Set up navigation using React Navigation.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement a basic stack navigator and tab navigator for the app.",
+            "status": "pending",
+            "testStrategy": "Test navigation flow between screens to ensure it works as expected."
+          },
+          {
+            "id": 4,
+            "title": "Set Up Redux Store",
+            "description": "Initialize Redux store for state management.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create a Redux store and configure it with necessary middleware and reducers.",
+            "status": "pending",
+            "testStrategy": "Check that the Redux store is accessible and state updates correctly."
+          },
+          {
+            "id": 5,
+            "title": "Implement Basic UI Components",
+            "description": "Develop basic UI components for the app.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create reusable components such as buttons, headers, and footers.",
+            "status": "pending",
+            "testStrategy": "Ensure components render correctly and are reusable across different screens."
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Mobile Upload Feature",
+        "description": "Develop mobile upload feature with progress indicators.",
+        "details": "Integrate image picker, implement upload logic with progress indicators, and handle background uploads.\n<info added on 2025-11-07T20:44:47.550Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Upload/ImagePicker.tsx (image picker component)\n- Create: mobile-app/src/components/Upload/UploadProgress.tsx (progress indicator)\n- Create: mobile-app/src/components/Upload/BatchProgress.tsx (batch progress)\n- Create: mobile-app/src/hooks/useUpload.ts (upload logic hook)\n- Create: mobile-app/src/services/uploadService.ts (API service)\n- Create: mobile-app/src/services/sseService.ts (SSE client or polling fallback)\n- Create: mobile-app/src/types/upload.ts (TypeScript types)\n- Modify: mobile-app/src/App.tsx (add upload screen)\n</info added on 2025-11-07T20:44:47.550Z>",
+        "testStrategy": "Test mobile upload functionality and background behavior.",
+        "priority": "medium",
+        "dependencies": [
+          19,
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate Image Picker",
+            "description": "Add an image picker to the mobile app for selecting images to upload.",
+            "dependencies": [],
+            "details": "Use a library like react-native-image-picker to allow users to select images from their device.",
+            "status": "pending",
+            "testStrategy": "Test image selection on various devices."
+          },
+          {
+            "id": 2,
+            "title": "Implement Upload Logic",
+            "description": "Develop the logic to upload images to the server.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a function to handle image uploads using fetch or axios, ensuring proper error handling.",
+            "status": "pending",
+            "testStrategy": "Test image upload with different file sizes and network conditions."
+          },
+          {
+            "id": 3,
+            "title": "Add Progress Indicators",
+            "description": "Display upload progress to the user during the upload process.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement a progress bar or percentage indicator to show upload progress using state management.",
+            "status": "pending",
+            "testStrategy": "Verify progress updates accurately during uploads."
+          },
+          {
+            "id": 4,
+            "title": "Handle Background Uploads",
+            "description": "Ensure uploads continue in the background if the app is minimized.",
+            "dependencies": [
+              3
+            ],
+            "details": "Use libraries like react-native-background-upload to manage uploads when the app is not active.",
+            "status": "pending",
+            "testStrategy": "Test background uploads by minimizing the app during an upload."
+          },
+          {
+            "id": 5,
+            "title": "Integrate with Existing UI",
+            "description": "Connect the upload feature with the existing mobile app UI.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Ensure the upload button and progress indicators are integrated into the current app design.",
+            "status": "pending",
+            "testStrategy": "Test UI integration and user flow for the upload feature."
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "title": "Mobile Photo Grid",
+        "description": "Implement photo grid view for mobile app.",
+        "details": "Develop FlatList for displaying photo thumbnails with pull-to-refresh and multi-select capabilities.\n<info added on 2025-11-07T20:44:49.594Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/PhotoGrid/PhotoGrid.tsx (FlatList grid component)\n- Create: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (thumbnail component)\n- Create: mobile-app/src/components/PhotoGrid/PhotoViewer.tsx (full-size photo viewer)\n- Create: mobile-app/src/hooks/usePhotos.ts (photo fetching hook)\n- Create: mobile-app/src/services/photoService.ts (API service)\n- Modify: mobile-app/src/App.tsx (add photo grid screen)\n</info added on 2025-11-07T20:44:49.594Z>",
+        "testStrategy": "Test grid rendering and interaction on mobile devices.",
+        "priority": "medium",
+        "dependencies": [
+          20
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up FlatList Component",
+            "description": "Initialize and configure FlatList for displaying photo thumbnails.",
+            "dependencies": [],
+            "details": "Create a FlatList component in the mobile app to display photo thumbnails. Ensure it is scrollable and optimized for performance.",
+            "status": "pending",
+            "testStrategy": "Verify FlatList renders correctly with sample data."
+          },
+          {
+            "id": 2,
+            "title": "Implement Pull-to-Refresh",
+            "description": "Add pull-to-refresh functionality to the photo grid.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate pull-to-refresh feature using React Native's RefreshControl to reload the photo grid data.",
+            "status": "pending",
+            "testStrategy": "Test pull-to-refresh by simulating a data refresh and ensuring UI updates."
+          },
+          {
+            "id": 3,
+            "title": "Add Multi-Select Capability",
+            "description": "Enable multi-select functionality for photo thumbnails.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement multi-select feature allowing users to select multiple photos by tapping on them. Update UI to reflect selected state.",
+            "status": "pending",
+            "testStrategy": "Test multi-select by selecting and deselecting multiple photos."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Photo Data Source",
+            "description": "Connect FlatList to a real data source for photos.",
+            "dependencies": [
+              1
+            ],
+            "details": "Fetch photo data from the backend or local storage and bind it to the FlatList component.",
+            "status": "pending",
+            "testStrategy": "Ensure photos are fetched and displayed correctly in the grid."
+          },
+          {
+            "id": 5,
+            "title": "Optimize Grid Performance",
+            "description": "Enhance performance of the photo grid for smooth scrolling.",
+            "dependencies": [
+              1,
+              4
+            ],
+            "details": "Optimize FlatList performance by using keyExtractor, memoization, and other React Native optimizations.",
+            "status": "pending",
+            "testStrategy": "Test grid performance with a large dataset to ensure smooth scrolling."
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "title": "Mobile Tagging System",
+        "description": "Develop tagging system for mobile app.",
+        "details": "Implement tag input modal, add tags to photos, and display tags on grid items.\n<info added on 2025-11-07T20:44:52.815Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Tagging/TagInput.tsx (tag input modal)\n- Create: mobile-app/src/components/Tagging/TagDisplay.tsx (tag display)\n- Create: mobile-app/src/components/Tagging/BulkTagModal.tsx (bulk tag modal)\n- Create: mobile-app/src/hooks/useTags.ts (tagging logic hook)\n- Create: mobile-app/src/services/tagService.ts (API service)\n- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add tag display)\n</info added on 2025-11-07T20:44:52.815Z>",
+        "testStrategy": "Test tagging functionality and UI integration on mobile.",
+        "priority": "medium",
+        "dependencies": [
+          21,
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Tag Input Modal",
+            "description": "Create a design for the tag input modal in the mobile app.",
+            "dependencies": [],
+            "details": "Design the UI for the tag input modal, ensuring it fits within the app's existing design language.",
+            "status": "pending",
+            "testStrategy": "Review design with UX team."
+          },
+          {
+            "id": 2,
+            "title": "Implement Tag Input Modal",
+            "description": "Develop the tag input modal based on the design.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use React Native to implement the modal, allowing users to input tags.",
+            "status": "pending",
+            "testStrategy": "Test modal appearance and input functionality."
+          },
+          {
+            "id": 3,
+            "title": "Add Tags to Photos",
+            "description": "Enable users to add tags to photos within the app.",
+            "dependencies": [
+              2
+            ],
+            "details": "Integrate the tag input modal with the photo component to allow tagging.",
+            "status": "pending",
+            "testStrategy": "Test adding tags to various photos."
+          },
+          {
+            "id": 4,
+            "title": "Display Tags on Photo Grid",
+            "description": "Show tags on photos within the grid view.",
+            "dependencies": [
+              3
+            ],
+            "details": "Modify the photo grid component to display tags under each photo.",
+            "status": "pending",
+            "testStrategy": "Verify tags display correctly on grid items."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Tagging with Backend",
+            "description": "Connect the tagging system to the backend API.",
+            "dependencies": [
+              4
+            ],
+            "details": "Ensure tags are saved and retrieved from the backend server.",
+            "status": "pending",
+            "testStrategy": "Test backend integration for saving and loading tags."
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "title": "Mobile Download Feature",
+        "description": "Implement download functionality for mobile app.",
+        "details": "Develop download feature to save photos to device with progress indicators.\n<info added on 2025-11-07T20:44:54.608Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Download/DownloadButton.tsx (download button)\n- Create: mobile-app/src/components/Download/BulkDownload.tsx (bulk download)\n- Create: mobile-app/src/hooks/useDownload.ts (download logic hook)\n- Create: mobile-app/src/services/downloadService.ts (API service)\n- Create: mobile-app/src/utils/fileSystem.ts (save to device utilities)\n- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add download button)\n</info added on 2025-11-07T20:44:54.608Z>",
+        "testStrategy": "Test download functionality and success notifications on mobile.",
+        "priority": "medium",
+        "dependencies": [
+          21,
+          11
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Download UI",
+            "description": "Create UI components for download functionality.",
+            "dependencies": [
+              21,
+              11
+            ],
+            "details": "Design progress indicators and download buttons for the mobile app.",
+            "status": "pending",
+            "testStrategy": "Verify UI components render correctly."
+          },
+          {
+            "id": 2,
+            "title": "Implement Download Logic",
+            "description": "Develop the logic to download photos to the device.",
+            "dependencies": [
+              1
+            ],
+            "details": "Write code to handle file downloads and manage storage permissions.",
+            "status": "pending",
+            "testStrategy": "Test download logic with various file sizes."
+          },
+          {
+            "id": 3,
+            "title": "Integrate Progress Indicators",
+            "description": "Add progress indicators to the download process.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement real-time progress updates during downloads.",
+            "status": "pending",
+            "testStrategy": "Check progress indicators update accurately during downloads."
+          },
+          {
+            "id": 4,
+            "title": "Handle Download Completion",
+            "description": "Implement functionality to handle download completion.",
+            "dependencies": [
+              3
+            ],
+            "details": "Trigger notifications or UI updates when downloads finish.",
+            "status": "pending",
+            "testStrategy": "Ensure notifications appear correctly after downloads."
+          },
+          {
+            "id": 5,
+            "title": "Test Download Feature",
+            "description": "Conduct comprehensive testing of the download feature.",
+            "dependencies": [
+              4
+            ],
+            "details": "Perform end-to-end testing on various devices and network conditions.",
+            "status": "pending",
+            "testStrategy": "Test download functionality and success notifications on mobile."
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "title": "AWS Deployment",
+        "description": "Deploy backend to AWS Elastic Beanstalk.",
+        "details": "Configure Elastic Beanstalk environment, deploy Spring Boot application, and set environment variables.\n<info added on 2025-11-07T20:44:56.969Z>\nFiles to create/modify:\n\n- Create: `backend/.ebextensions/environment.config` for setting environment variables.\n- Create: `backend/.ebextensions/01_java.config` to specify the Java version.\n- Create: `backend/.ebextensions/02_postgres.config` for database connection settings.\n- Create: `backend/.ebextensions/03_s3.config` for S3 bucket configuration.\n- Modify: `backend/pom.xml` to ensure packaging is set to JAR.\n- Create: `backend/application-prod.properties` for production-specific properties.\n- Create: `backend/Procfile` if needed for Elastic Beanstalk deployment.\n</info added on 2025-11-07T20:44:56.969Z>",
+        "testStrategy": "Test deployed backend functionality and AWS integration.",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up AWS Elastic Beanstalk Environment",
+            "description": "Create and configure the Elastic Beanstalk environment for deployment.",
+            "dependencies": [],
+            "details": "Initialize an Elastic Beanstalk environment suitable for a Spring Boot application. Configure necessary resources such as EC2 instances, load balancers, and security groups.",
+            "status": "pending",
+            "testStrategy": "Verify environment setup by checking resource allocation and accessibility."
+          },
+          {
+            "id": 2,
+            "title": "Configure Environment Variables",
+            "description": "Set necessary environment variables for the application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Identify and set all required environment variables in the Elastic Beanstalk console to ensure the application runs correctly.",
+            "status": "pending",
+            "testStrategy": "Check if the application reads the environment variables correctly during startup."
+          },
+          {
+            "id": 3,
+            "title": "Deploy Spring Boot Application",
+            "description": "Deploy the Spring Boot application to the configured Elastic Beanstalk environment.",
+            "dependencies": [
+              2
+            ],
+            "details": "Package the Spring Boot application as a JAR file and upload it to Elastic Beanstalk for deployment.",
+            "status": "pending",
+            "testStrategy": "Ensure the application starts without errors and is accessible via the provided URL."
+          },
+          {
+            "id": 4,
+            "title": "Configure Auto-scaling and Load Balancing",
+            "description": "Set up auto-scaling and load balancing for the application.",
+            "dependencies": [
+              3
+            ],
+            "details": "Configure auto-scaling rules and load balancing to handle varying loads efficiently. Adjust instance counts and scaling triggers as needed.",
+            "status": "pending",
+            "testStrategy": "Simulate load to test auto-scaling and load balancing functionality."
+          },
+          {
+            "id": 5,
+            "title": "Test Deployed Application Functionality",
+            "description": "Test the functionality of the deployed application and its integration with AWS services.",
+            "dependencies": [
+              4
+            ],
+            "details": "Perform end-to-end testing of the application to verify its functionality and integration with AWS services like RDS and S3.",
+            "status": "pending",
+            "testStrategy": "Conduct functional and integration tests to ensure all features work as expected."
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "title": "Frontend Deployment",
+        "description": "Deploy web frontend to hosting service.",
+        "details": "Build web app for production and deploy to Vercel/Netlify. Update API base URL to production.\n<info added on 2025-11-07T20:44:59.351Z>\nFiles to create/modify:\n\n- Create: `web-app/vite.config.ts` for production build configuration.\n- Create: `web-app/.env.production` to specify the production API URL.\n- Create: `web-app/vercel.json` for Vercel deployment configuration or `netlify.toml` for Netlify configuration.\n- Modify: `web-app/package.json` to add a build script.\n- Create: `web-app/public/_redirects` for SPA routing if using Netlify.\n</info added on 2025-11-07T20:44:59.351Z>",
+        "testStrategy": "Test deployed web app functionality and integration with backend.",
+        "priority": "medium",
+        "dependencies": [
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Prepare Production Build",
+            "description": "Build the web app for production using Vite.",
+            "dependencies": [],
+            "details": "Run the build command to generate optimized production files.",
+            "status": "pending",
+            "testStrategy": "Verify the build output for errors and warnings."
+          },
+          {
+            "id": 2,
+            "title": "Update API Base URL",
+            "description": "Change the API base URL to point to the production server.",
+            "dependencies": [
+              1
+            ],
+            "details": "Modify the environment configuration to use the production API URL.",
+            "status": "pending",
+            "testStrategy": "Ensure the frontend communicates with the production API."
+          },
+          {
+            "id": 3,
+            "title": "Configure Hosting Service",
+            "description": "Set up the hosting service for deployment.",
+            "dependencies": [
+              1
+            ],
+            "details": "Choose Vercel or Netlify and configure the project settings.",
+            "status": "pending",
+            "testStrategy": "Verify the hosting configuration settings."
+          },
+          {
+            "id": 4,
+            "title": "Deploy to Hosting Service",
+            "description": "Deploy the production build to the chosen hosting service.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Upload the build files to Vercel or Netlify and initiate deployment.",
+            "status": "pending",
+            "testStrategy": "Check the deployment logs for any issues."
+          },
+          {
+            "id": 5,
+            "title": "Test Deployed Application",
+            "description": "Test the deployed web app for functionality and integration.",
+            "dependencies": [
+              4
+            ],
+            "details": "Perform end-to-end testing to ensure the app works as expected.",
+            "status": "pending",
+            "testStrategy": "Conduct manual and automated tests to verify functionality."
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "title": "Frontend Authentication UI Implementation",
+        "description": "Develop login and signup pages with form validation, error handling, and backend API integration.",
+        "details": "Create LoginPage and SignupPage components with forms for user input. Implement validation for fields such as username, password, and confirm password. Integrate with authService to handle API calls for user login and registration. Develop a ProtectedRoute component to ensure route protection, redirecting unauthenticated users to the login page. Implement navigation between login and signup pages and ensure automatic redirection to the dashboard upon successful authentication. Provide user feedback for validation errors and API call failures.\n<info added on 2025-11-08T02:52:00.861Z>\n✅ COMPLETED: Frontend Authentication UI Implementation\n\nFiles Created/Modified:\n- Created: web-app/src/pages/LoginPage.tsx (login form with username/password)\n- Created: web-app/src/pages/SignupPage.tsx (signup form with username/password/confirm password)\n- Created: web-app/src/components/ProtectedRoute.tsx (route protection component)\n- Modified: web-app/src/services/authService.ts (added register method)\n- Modified: web-app/src/router/Router.tsx (added signup route and protected routes)\n- Modified: web-app/src/App.tsx (removed login button from top navigation)\n\nBackend Integration:\n- Backend registration endpoint (/api/auth/register) was also implemented\n- RegisterRequest DTO created\n- AuthService.register() method added\n- AuthController.register() endpoint added\n- CORS updated to include port 5174\n\nFeatures Implemented:\n✅ Login page with form validation\n✅ Signup page with password confirmation\n✅ Client-side validation (username min 3 chars, password min 6 chars)\n✅ Error handling and user feedback\n✅ Automatic login after successful registration\n✅ Route protection (redirects unauthenticated users to login)\n✅ Navigation between login and signup pages\n✅ Integration with AuthContext for state management\n✅ JWT token storage in localStorage\n\nAdditional Improvements:\n✅ Added redirect logic for authenticated users accessing login/signup pages\n✅ Fixed TypeScript linting errors (replaced 'any' with proper error handling)\n✅ Improved UX - prevents authenticated users from seeing login/signup forms\n</info added on 2025-11-08T02:52:00.861Z>",
+        "testStrategy": "Test form validation by entering invalid data and checking for appropriate error messages. Verify successful API integration by checking network requests during login and registration. Test route protection by attempting to access protected routes without authentication. Ensure navigation between login and signup pages works correctly. Confirm automatic redirection to the dashboard after successful login.",
+        "status": "done",
+        "dependencies": [
+          13,
+          14
+        ],
+        "priority": "medium",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-11-07T20:01:37.664Z",
+      "updated": "2025-11-08T02:52:02.432Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
