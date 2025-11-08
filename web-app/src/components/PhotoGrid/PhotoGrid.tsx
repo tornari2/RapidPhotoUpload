@@ -11,6 +11,10 @@ interface PhotoGridProps {
   onLoadMore: () => void;
   onPhotoClick: (photo: Photo) => void;
   onDelete?: (photo: Photo) => void;
+  onTag?: (photo: Photo) => void;
+  selectedPhotos?: Set<string>;
+  onToggleSelection?: (photoId: string) => void;
+  onLoadedCountChange?: (count: number) => void;
 }
 
 /**
@@ -24,32 +28,123 @@ export function PhotoGrid({
   onLoadMore,
   onPhotoClick,
   onDelete,
+  onTag,
+  selectedPhotos,
+  onToggleSelection,
+  onLoadedCountChange,
 }: PhotoGridProps) {
   const observerTarget = useRef<HTMLDivElement>(null);
   const [thumbnailUrls, setThumbnailUrls] = useState<Map<string, string>>(new Map());
+  const thumbnailUrlsRef = useRef<Map<string, string>>(new Map());
+  const [loadedPhotoIds, setLoadedPhotoIds] = useState<Set<string>>(new Set());
 
-  // Get thumbnail URL for a photo (with caching)
+  // Keep ref in sync with state
+  useEffect(() => {
+    thumbnailUrlsRef.current = thumbnailUrls;
+  }, [thumbnailUrls]);
+
+  // Handle photo load completion
+  const handlePhotoLoad = useCallback((photoId: string) => {
+    setLoadedPhotoIds((prev) => {
+      const updated = new Set(prev);
+      updated.add(photoId);
+      return updated;
+    });
+  }, []);
+
+  // Don't reset loaded photos - keep them persistent for smooth scrolling
+  // Only reset if the photo IDs completely change (e.g., user switch)
+
+  // Notify parent when loaded count changes
+  useEffect(() => {
+    if (onLoadedCountChange) {
+      // Only count non-uploading photos that have loaded
+      const loadedCount = photos.filter(
+        (photo) => photo.uploadStatus !== 'UPLOADING' && loadedPhotoIds.has(photo.id)
+      ).length;
+      onLoadedCountChange(loadedCount);
+    }
+  }, [loadedPhotoIds, photos, onLoadedCountChange]);
+
+  // Prefetch thumbnail URLs for all photos in batches
+  useEffect(() => {
+    const prefetchThumbnailUrls = async () => {
+      // Get photos that don't have cached URLs yet
+      const photosToPrefetch = photos.filter(
+        (photo) => 
+          photo.uploadStatus !== 'UPLOADING' && 
+          !thumbnailUrlsRef.current.has(photo.id)
+      );
+
+      if (photosToPrefetch.length === 0) return;
+
+      // Prefetch in batches of 20 to avoid overwhelming the server
+      const batchSize = 20;
+      for (let i = 0; i < photosToPrefetch.length; i += batchSize) {
+        const batch = photosToPrefetch.slice(i, i + batchSize);
+        
+        // Fetch all URLs in parallel for this batch
+        const promises = batch.map(async (photo) => {
+          try {
+            const response = await photoService.getDownloadUrl(photo.id, photo.userId, 60);
+            const url = response.downloadUrl;
+            
+            // Cache the URL
+            setThumbnailUrls((prev) => {
+              const updated = new Map(prev);
+              updated.set(photo.id, url);
+              return updated;
+            });
+            
+            // Preload the image in the browser
+            const img = new Image();
+            img.src = url;
+            
+            return url;
+          } catch (error) {
+            console.error(`Failed to prefetch thumbnail URL for ${photo.id}:`, error);
+            return null;
+          }
+        });
+        
+        await Promise.all(promises);
+        
+        // Small delay between batches to avoid overwhelming
+        if (i + batchSize < photosToPrefetch.length) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      }
+    };
+
+    prefetchThumbnailUrls();
+  }, [photos]);
+
+  // Get thumbnail URL for a photo (with persistent caching)
   const getThumbnailUrl = useCallback(
     async (photo: Photo): Promise<string> => {
-      // Return cached URL if available
-      if (thumbnailUrls.has(photo.id)) {
-        return thumbnailUrls.get(photo.id)!;
+      // Return cached URL if available (use ref to access latest value)
+      if (thumbnailUrlsRef.current.has(photo.id)) {
+        return thumbnailUrlsRef.current.get(photo.id)!;
       }
 
-      // Fetch download URL
+      // Fetch download URL (should rarely happen due to prefetching)
       try {
         const response = await photoService.getDownloadUrl(photo.id, photo.userId, 60);
         const url = response.downloadUrl;
         
-        // Cache the URL
-        setThumbnailUrls((prev) => new Map(prev).set(photo.id, url));
+        // Cache the URL persistently (don't clear on photos array changes)
+        setThumbnailUrls((prev) => {
+          const updated = new Map(prev);
+          updated.set(photo.id, url);
+          return updated;
+        });
         return url;
       } catch (error) {
         console.error('Failed to get thumbnail URL:', error);
         throw error;
       }
     },
-    [thumbnailUrls]
+    [] // Stable reference - uses ref to access current cache
   );
 
   // Intersection Observer for infinite scroll
@@ -88,7 +183,7 @@ export function PhotoGrid({
   if (photos.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">No photos found</p>
+        <p className="text-white text-lg">No photos found</p>
         <p className="text-gray-400 text-sm mt-2">Upload some photos to get started</p>
       </div>
     );
@@ -105,6 +200,9 @@ export function PhotoGrid({
             onClick={onPhotoClick}
             getThumbnailUrl={getThumbnailUrl}
             onDelete={onDelete}
+            onTag={onTag}
+            isSelected={selectedPhotos?.has(photo.id)}
+            onLoad={handlePhotoLoad}
           />
         ))}
       </div>
@@ -120,7 +218,7 @@ export function PhotoGrid({
 
       {/* End of list indicator */}
       {!hasNextPage && photos.length > 0 && (
-        <div className="text-center py-8 text-gray-500 text-sm">
+        <div className="text-center py-8 text-gray-400 text-sm">
           All photos loaded
         </div>
       )}

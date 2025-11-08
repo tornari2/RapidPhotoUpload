@@ -64,9 +64,6 @@ export interface PhotoMetadataResponse {
   createdAt: string;
   completedAt?: string;
   downloadUrl?: string;
-  tags?: Array<{
-    id: string;
-    name: string;
-  }>;
+  tags?: string[]; // Backend returns tags as string array
 }
 

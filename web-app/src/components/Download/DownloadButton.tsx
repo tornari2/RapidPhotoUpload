@@ -38,13 +38,13 @@ export function DownloadButton({ photo, variant = 'icon', className = '' }: Down
     <button
       onClick={handleDownload}
       disabled={isDownloading}
-      className={`p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`p-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       aria-label="Download photo"
       title="Download photo"
     >
       {isDownloading ? (
         <svg
-          className="w-5 h-5 animate-spin"
+          className="w-4 h-4 animate-spin"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -58,7 +58,7 @@ export function DownloadButton({ photo, variant = 'icon', className = '' }: Down
         </svg>
       ) : (
         <svg
-          className="w-5 h-5"
+          className="w-4 h-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

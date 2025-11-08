@@ -12,14 +12,21 @@ export const downloadService = {
     try {
       const response = await photoService.getDownloadUrl(photo.id, photo.userId, expirationMinutes);
       
+      // Fetch the image as a blob to force download instead of opening
+      const imageResponse = await fetch(response.downloadUrl);
+      const blob = await imageResponse.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
       // Create a temporary anchor element to trigger download
       const link = document.createElement('a');
-      link.href = response.downloadUrl;
+      link.href = blobUrl;
       link.download = response.filename;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      // Clean up the blob URL
+      URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Failed to download photo:', error);
       throw error;

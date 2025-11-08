@@ -2,9 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from '../App';
 import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
-import DashboardPage from '../pages/DashboardPage';
-import UploadPage from '../pages/UploadPage';
-import PhotosPage from '../pages/PhotosPage';
+import GalleryPage from '../pages/GalleryPage';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 /**
@@ -28,15 +26,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <DashboardPage />,
-          },
-          {
-            path: 'upload',
-            element: <UploadPage />,
-          },
-          {
-            path: 'photos',
-            element: <PhotosPage />,
+            element: <GalleryPage />,
           },
         ],
       },

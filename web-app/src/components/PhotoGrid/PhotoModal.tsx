@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { photoService } from '../../services/photoService';
 import { DownloadButton } from '../Download/DownloadButton';
 import type { Photo } from '../../types/photo';
@@ -32,18 +32,21 @@ export function PhotoModal({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const retryCountRef = useRef<number>(0);
+  const maxRetries = 3;
 
   // Load full-size image when photo changes
   useEffect(() => {
     if (!photo || !isOpen) {
       setImageUrl(null);
       setError(false);
+      retryCountRef.current = 0;
       return;
     }
 
     let isCancelled = false;
 
-    const loadImage = async () => {
+    const loadImage = async (retryAttempt = 0) => {
       try {
         setIsLoading(true);
         setError(false);
@@ -51,16 +54,30 @@ export function PhotoModal({
         if (!isCancelled) {
           setImageUrl(response.downloadUrl);
           setIsLoading(false);
+          retryCountRef.current = 0; // Reset retry count on success
         }
       } catch (err) {
         if (!isCancelled) {
+          // Retry with exponential backoff
+          if (retryAttempt < maxRetries) {
+            const delay = Math.min(1000 * Math.pow(2, retryAttempt), 10000); // Max 10 seconds
+            retryCountRef.current = retryAttempt + 1;
+            setTimeout(() => {
+              if (!isCancelled) {
+                loadImage(retryAttempt + 1);
+              }
+            }, delay);
+          } else {
+            // Max retries reached, show error
           setError(true);
           setIsLoading(false);
+            retryCountRef.current = 0;
+          }
         }
       }
     };
 
-    loadImage();
+    loadImage(retryCountRef.current);
 
     return () => {
       isCancelled = true;
@@ -205,6 +222,27 @@ export function PhotoModal({
             src={imageUrl}
             alt={photo.filename}
             className="max-w-full max-h-[90vh] object-contain"
+            onError={() => {
+              // Retry image load with exponential backoff
+              if (retryCountRef.current < maxRetries) {
+                const delay = Math.min(1000 * Math.pow(2, retryCountRef.current), 10000);
+                retryCountRef.current += 1;
+                setTimeout(() => {
+                  // Force reload by appending timestamp to URL
+                  const newUrl = imageUrl.includes('?') 
+                    ? `${imageUrl}&retry=${Date.now()}`
+                    : `${imageUrl}?retry=${Date.now()}`;
+                  setImageUrl(newUrl);
+                }, delay);
+              } else {
+                setError(true);
+                retryCountRef.current = 0;
+              }
+            }}
+            onLoad={() => {
+              // Reset retry count on successful load
+              retryCountRef.current = 0;
+            }}
           />
         )}
       </div>
