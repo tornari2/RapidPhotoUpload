@@ -146,7 +146,7 @@ export default function RegisterScreen() {
               value={password}
               onChangeText={setPassword}
               error={errors.password}
-              secureTextEntry
+              secureTextEntry={true}
               editable={!isLoading}
             />
 
@@ -156,7 +156,7 @@ export default function RegisterScreen() {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               error={errors.confirmPassword}
-              secureTextEntry
+              secureTextEntry={true}
               editable={!isLoading}
             />
 

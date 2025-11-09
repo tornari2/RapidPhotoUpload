@@ -108,7 +108,7 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               error={errors.password}
-              secureTextEntry
+              secureTextEntry={true}
               editable={!isLoading}
             />
 
