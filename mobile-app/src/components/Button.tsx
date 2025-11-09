@@ -31,9 +31,9 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
-  const isDisabled = disabled || loading;
+  const isDisabled = Boolean(disabled || loading);
 
-  const getSizeStyles = () => {
+  const getSizeStyles = (): ViewStyle => {
     switch (size) {
       case 'small':
         return { height: 36, paddingHorizontal: 16 };
@@ -44,7 +44,7 @@ export const Button: React.FC<ButtonProps> = ({
     }
   };
 
-  const getTextSize = () => {
+  const getTextSize = (): number => {
     switch (size) {
       case 'small':
         return 14;
@@ -86,7 +86,7 @@ export const Button: React.FC<ButtonProps> = ({
           colors={['#4F46E5', '#7C3AED', '#9333EA']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[styles.gradient, { borderRadius: 8 }]}
+          style={styles.gradient}
         >
           {renderContent()}
         </LinearGradient>
@@ -123,8 +123,10 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
     width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 8,
   },
   content: {
     flexDirection: 'row',
@@ -150,4 +152,3 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
 });
-

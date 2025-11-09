@@ -18,11 +18,12 @@ interface CustomTextInputProps extends TextInputProps {
 export const TextInput: React.FC<CustomTextInputProps> = ({
   label,
   error,
-  secureTextEntry,
+  secureTextEntry = false,
   style,
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const isSecure = Boolean(secureTextEntry);
 
   return (
     <View style={styles.container}>
@@ -31,11 +32,11 @@ export const TextInput: React.FC<CustomTextInputProps> = ({
         <RNTextInput
           style={[styles.input, style]}
           placeholderTextColor="#6B7280"
-          secureTextEntry={secureTextEntry && !isPasswordVisible}
+          secureTextEntry={isSecure && !isPasswordVisible}
           autoCapitalize="none"
           {...props}
         />
-        {secureTextEntry && (
+        {isSecure && (
           <TouchableOpacity
             onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             style={styles.eyeIcon}
@@ -91,4 +92,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 });
-
