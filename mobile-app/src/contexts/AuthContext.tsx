@@ -25,7 +25,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const checkAuth = async () => {
     try {
@@ -73,10 +73,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Ensure boolean values
+  const isAuthenticatedValue = Boolean(user !== null);
+  const isLoadingValue = Boolean(isLoading);
+
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
-    isLoading,
+    isAuthenticated: isAuthenticatedValue,
+    isLoading: isLoadingValue,
     login,
     logout,
     checkAuth,

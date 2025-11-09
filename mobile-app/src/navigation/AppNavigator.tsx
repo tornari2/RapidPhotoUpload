@@ -45,12 +45,14 @@ const RootStack = createStackNavigator<RootStackParamList>();
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 
+const HEADER_SHOWN = false;
+
 // Auth Navigator (Login, Register)
 function AuthNavigator() {
   return (
     <AuthStack.Navigator
       screenOptions={{
-        headerShown: false,
+        headerShown: HEADER_SHOWN,
       }}
     >
       <AuthStack.Screen name="Login" component={LoginScreen} />
@@ -64,7 +66,7 @@ function MainNavigator() {
   return (
     <MainTab.Navigator
       screenOptions={{
-        headerShown: false,
+        headerShown: HEADER_SHOWN,
         tabBarStyle: {
           backgroundColor: '#000',
           borderTopColor: '#333',
@@ -85,9 +87,10 @@ function MainNavigator() {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            const iconSize = typeof size === 'number' ? size : 24;
+            return <Ionicons name="home-outline" size={iconSize} color={color} />;
+          },
         }}
       />
       <MainTab.Screen
@@ -95,9 +98,10 @@ function MainNavigator() {
         component={GalleryScreen}
         options={{
           tabBarLabel: 'Gallery',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="images-outline" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            const iconSize = typeof size === 'number' ? size : 24;
+            return <Ionicons name="images-outline" size={iconSize} color={color} />;
+          },
         }}
       />
       <MainTab.Screen
@@ -105,9 +109,10 @@ function MainNavigator() {
         component={UploadScreen}
         options={{
           tabBarLabel: 'Upload',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cloud-upload-outline" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            const iconSize = typeof size === 'number' ? size : 24;
+            return <Ionicons name="cloud-upload-outline" size={iconSize} color={color} />;
+          },
         }}
       />
       <MainTab.Screen
@@ -115,9 +120,10 @@ function MainNavigator() {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            const iconSize = typeof size === 'number' ? size : 24;
+            return <Ionicons name="person-outline" size={iconSize} color={color} />;
+          },
         }}
       />
     </MainTab.Navigator>
@@ -127,8 +133,12 @@ function MainNavigator() {
 // Root Navigator
 export default function AppNavigator() {
   const { isAuthenticated, isLoading } = useAuth();
+  
+  // Ensure boolean values
+  const isAuth = Boolean(isAuthenticated);
+  const isLoad = Boolean(isLoading);
 
-  if (isLoading) {
+  if (isLoad === true) {
     // Show loading screen
     return (
       <View style={styles.loadingContainer}>
@@ -139,8 +149,8 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
+      <RootStack.Navigator screenOptions={{ headerShown: HEADER_SHOWN }}>
+        {isAuth === true ? (
           <RootStack.Screen name="Main" component={MainNavigator} />
         ) : (
           <RootStack.Screen name="Auth" component={AuthNavigator} />
