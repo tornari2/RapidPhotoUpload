@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,5 +30,15 @@ public class PhotoResponse {
     private Integer retryCount;
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
+    private List<TagDto> tags;
+    
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TagDto {
+        private UUID id;
+        private String name;
+    }
 }
 

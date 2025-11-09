@@ -39,7 +39,7 @@ public class DownloadPhotoHandler {
                 query.getPhotoId(), query.getUserId());
         
         // Find photo and verify ownership
-        Photo photo = photoRepository.findByIdAndUserId(query.getPhotoId(), query.getUserId())
+        Photo photo = photoRepository.findByIdAndUser_Id(query.getPhotoId(), query.getUserId())
                 .orElseThrow(() -> {
                     log.warn("Photo not found or access denied: photoId={}, userId={}", 
                             query.getPhotoId(), query.getUserId());

@@ -37,7 +37,7 @@ export const TextInput: React.FC<CustomTextInputProps> = ({
           style={[styles.input, style]}
           placeholderTextColor="#6B7280"
           secureTextEntry={isSecure && !isPasswordVisible}
-          autoCapitalize="none"
+          autoCapitalize={props.autoCapitalize || "none"}
           editable={isEditable}
         />
         {isSecure && (

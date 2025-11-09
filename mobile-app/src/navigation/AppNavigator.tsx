@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -41,20 +41,14 @@ export type MainTabParamList = {
   Profile: undefined;
 };
 
-const RootStack = createStackNavigator<RootStackParamList>();
-const AuthStack = createStackNavigator<AuthStackParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
-
-const HEADER_SHOWN = false;
 
 // Auth Navigator (Login, Register)
 function AuthNavigator() {
   return (
-    <AuthStack.Navigator
-      screenOptions={{
-        headerShown: HEADER_SHOWN,
-      }}
-    >
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Register" component={RegisterScreen} />
     </AuthStack.Navigator>
@@ -66,7 +60,7 @@ function MainNavigator() {
   return (
     <MainTab.Navigator
       screenOptions={{
-        headerShown: HEADER_SHOWN,
+        headerShown: false,
         tabBarStyle: {
           backgroundColor: '#000',
           borderTopColor: '#333',
@@ -87,10 +81,9 @@ function MainNavigator() {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => {
-            const iconSize = typeof size === 'number' ? size : 24;
-            return <Ionicons name="home-outline" size={iconSize} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
         }}
       />
       <MainTab.Screen
@@ -98,10 +91,9 @@ function MainNavigator() {
         component={GalleryScreen}
         options={{
           tabBarLabel: 'Gallery',
-          tabBarIcon: ({ color, size }) => {
-            const iconSize = typeof size === 'number' ? size : 24;
-            return <Ionicons name="images-outline" size={iconSize} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="images-outline" size={size} color={color} />
+          ),
         }}
       />
       <MainTab.Screen
@@ -109,10 +101,9 @@ function MainNavigator() {
         component={UploadScreen}
         options={{
           tabBarLabel: 'Upload',
-          tabBarIcon: ({ color, size }) => {
-            const iconSize = typeof size === 'number' ? size : 24;
-            return <Ionicons name="cloud-upload-outline" size={iconSize} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cloud-upload-outline" size={size} color={color} />
+          ),
         }}
       />
       <MainTab.Screen
@@ -120,10 +111,9 @@ function MainNavigator() {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: ({ color, size }) => {
-            const iconSize = typeof size === 'number' ? size : 24;
-            return <Ionicons name="person-outline" size={iconSize} color={color} />;
-          },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
         }}
       />
     </MainTab.Navigator>
@@ -133,13 +123,8 @@ function MainNavigator() {
 // Root Navigator
 export default function AppNavigator() {
   const { isAuthenticated, isLoading } = useAuth();
-  
-  // Ensure boolean values
-  const isAuth = Boolean(isAuthenticated);
-  const isLoad = Boolean(isLoading);
 
-  if (isLoad === true) {
-    // Show loading screen
+  if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Loading...</Text>
@@ -149,8 +134,8 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: HEADER_SHOWN }}>
-        {isAuth === true ? (
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        {isAuthenticated ? (
           <RootStack.Screen name="Main" component={MainNavigator} />
         ) : (
           <RootStack.Screen name="Auth" component={AuthNavigator} />

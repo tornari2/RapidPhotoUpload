@@ -1,4 +1,5 @@
 import apiClient from './api';
+import { retryApiCall } from '../utils/retryUtils';
 
 export interface LoginRequest {
   username: string;
@@ -27,8 +28,10 @@ export const authService = {
    */
   async register(username: string, password: string): Promise<LoginResponse> {
     const request: RegisterRequest = { username, password };
-    const response = await apiClient.post<LoginResponse>('/auth/register', request);
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.post<LoginResponse>('/auth/register', request);
+      return response.data;
+    });
   },
 
   /**
@@ -36,18 +39,22 @@ export const authService = {
    */
   async login(username: string, password: string): Promise<LoginResponse> {
     const request: LoginRequest = { username, password };
-    const response = await apiClient.post<LoginResponse>('/auth/login', request);
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.post<LoginResponse>('/auth/login', request);
+      return response.data;
+    });
   },
 
   /**
    * Refresh JWT token
    */
   async refreshToken(token: string): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/refresh', {
-      token,
+    return retryApiCall(async () => {
+      const response = await apiClient.post<LoginResponse>('/auth/refresh', {
+        token,
+      });
+      return response.data;
     });
-    return response.data;
   },
 };
 

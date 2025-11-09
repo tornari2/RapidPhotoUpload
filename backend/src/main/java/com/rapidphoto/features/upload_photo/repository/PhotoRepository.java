@@ -30,27 +30,27 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
     /**
      * Find photos by user ID with pagination
      */
-    Page<Photo> findByUserId(UUID userId, Pageable pageable);
+    Page<Photo> findByUser_Id(UUID userId, Pageable pageable);
     
     /**
      * Find photos by user ID and status with pagination
      */
-    Page<Photo> findByUserIdAndUploadStatus(UUID userId, PhotoStatus status, Pageable pageable);
+    Page<Photo> findByUser_IdAndUploadStatus(UUID userId, PhotoStatus status, Pageable pageable);
     
     /**
      * Find photos by user ID and upload job ID with pagination
      */
-    Page<Photo> findByUserIdAndUploadJobId(UUID userId, UUID uploadJobId, Pageable pageable);
+    Page<Photo> findByUser_IdAndUploadJobId(UUID userId, UUID uploadJobId, Pageable pageable);
     
     /**
      * Find photos by user ID, status, and upload job ID with pagination
      */
-    Page<Photo> findByUserIdAndUploadStatusAndUploadJobId(
+    Page<Photo> findByUser_IdAndUploadStatusAndUploadJobId(
             UUID userId, PhotoStatus status, UUID uploadJobId, Pageable pageable);
     
     /**
      * Find photo by ID and user ID (for authorization)
      */
-    Optional<Photo> findByIdAndUserId(UUID id, UUID userId);
+    Optional<Photo> findByIdAndUser_Id(UUID id, UUID userId);
 }
 

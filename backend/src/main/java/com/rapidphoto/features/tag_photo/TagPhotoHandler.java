@@ -45,7 +45,7 @@ public class TagPhotoHandler {
                 command.getPhotoId(), command.getUserId(), command.getTagNames());
         
         // Verify photo exists and belongs to user
-        Photo photo = photoRepository.findByIdAndUserId(command.getPhotoId(), command.getUserId())
+        Photo photo = photoRepository.findByIdAndUser_Id(command.getPhotoId(), command.getUserId())
                 .orElseThrow(() -> {
                     log.warn("Photo not found or access denied: photoId={}, userId={}", 
                             command.getPhotoId(), command.getUserId());

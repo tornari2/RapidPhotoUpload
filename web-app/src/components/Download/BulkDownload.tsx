@@ -12,7 +12,7 @@ interface BulkDownloadProps {
  * Bulk download component with progress indicator
  */
 export function BulkDownload({ photos, onComplete, className = '' }: BulkDownloadProps) {
-  const { downloadPhotos, isDownloading, progress, error } = useDownload();
+  const { downloadPhotos, isDownloading, progress, photoProgress, error } = useDownload();
   const [showProgress, setShowProgress] = useState(false);
 
   const handleDownload = async () => {
@@ -32,6 +32,11 @@ export function BulkDownload({ photos, onComplete, className = '' }: BulkDownloa
       }, 2000);
     }
   };
+
+  // Count how many photos are actively downloading
+  const activeDownloads = Array.from(photoProgress.values()).filter(
+    (p) => p.status === 'downloading'
+  ).length;
 
   if (photos.length === 0) {
     return null;
@@ -78,9 +83,19 @@ export function BulkDownload({ photos, onComplete, className = '' }: BulkDownloa
 
       {/* Progress text */}
       {showProgress && isDownloading && (
-        <p className="mt-2 text-sm text-gray-600">
-          {progress.completed} of {progress.total} photos downloaded
-        </p>
+        <div className="mt-2 space-y-1">
+          <p className="text-sm text-white">
+            {progress.completed} of {progress.total} photos downloaded
+            {activeDownloads > 0 && (
+              <span className="ml-1 text-blue-400">
+                ({activeDownloads} downloading in parallel)
+              </span>
+            )}
+          </p>
+          <p className="text-xs text-gray-400">
+            {progress.percentage}% complete • Parallel downloads enabled
+          </p>
+        </div>
       )}
 
       {/* Error message */}

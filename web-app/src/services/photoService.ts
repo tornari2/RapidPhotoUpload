@@ -5,6 +5,7 @@ import type {
   DownloadPhotoResponse,
   PhotoMetadataResponse,
 } from '../types/photo';
+import { retryApiCall } from '../utils/retryUtils';
 
 /**
  * Service for photo-related API calls
@@ -36,10 +37,12 @@ export const photoService = {
       queryParams.append('sortDirection', params.sortDirection);
     }
 
-    const response = await apiClient.get<GetUserPhotosResponse>(
-      `/photos?${queryParams.toString()}`
-    );
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.get<GetUserPhotosResponse>(
+        `/photos?${queryParams.toString()}`
+      );
+      return response.data;
+    });
   },
 
   /**
@@ -56,10 +59,12 @@ export const photoService = {
       queryParams.append('expirationMinutes', expirationMinutes.toString());
     }
 
-    const response = await apiClient.get<DownloadPhotoResponse>(
-      `/photos/${photoId}/download?${queryParams.toString()}`
-    );
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.get<DownloadPhotoResponse>(
+        `/photos/${photoId}/download?${queryParams.toString()}`
+      );
+      return response.data;
+    });
   },
 
   /**
@@ -76,10 +81,12 @@ export const photoService = {
     queryParams.append('includeDownloadUrl', includeDownloadUrl.toString());
     queryParams.append('includeTags', includeTags.toString());
 
-    const response = await apiClient.get<PhotoMetadataResponse>(
-      `/photos/${photoId}/metadata?${queryParams.toString()}`
-    );
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.get<PhotoMetadataResponse>(
+        `/photos/${photoId}/metadata?${queryParams.toString()}`
+      );
+      return response.data;
+    });
   },
 
   /**
@@ -89,7 +96,9 @@ export const photoService = {
     const queryParams = new URLSearchParams();
     queryParams.append('userId', userId);
 
-    await apiClient.delete(`/photos/${photoId}?${queryParams.toString()}`);
+    return retryApiCall(async () => {
+      await apiClient.delete(`/photos/${photoId}?${queryParams.toString()}`);
+    });
   },
 };
 

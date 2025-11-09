@@ -1,7 +1,6 @@
 package com.rapidphoto.features.get_photos;
 
 import com.rapidphoto.domain.Photo;
-import com.rapidphoto.domain.PhotoStatus;
 import com.rapidphoto.features.get_photos.dto.GetUserPhotosResponse;
 import com.rapidphoto.features.get_photos.dto.PhotoResponse;
 import com.rapidphoto.features.upload_photo.repository.PhotoRepository;
@@ -50,16 +49,16 @@ public class GetUserPhotosHandler {
         // Query photos based on filters
         Page<Photo> photoPage;
         if (query.getStatus() != null && query.getUploadJobId() != null) {
-            photoPage = photoRepository.findByUserIdAndUploadStatusAndUploadJobId(
+            photoPage = photoRepository.findByUser_IdAndUploadStatusAndUploadJobId(
                     query.getUserId(), query.getStatus(), query.getUploadJobId(), pageable);
         } else if (query.getStatus() != null) {
-            photoPage = photoRepository.findByUserIdAndUploadStatus(
+            photoPage = photoRepository.findByUser_IdAndUploadStatus(
                     query.getUserId(), query.getStatus(), pageable);
         } else if (query.getUploadJobId() != null) {
-            photoPage = photoRepository.findByUserIdAndUploadJobId(
+            photoPage = photoRepository.findByUser_IdAndUploadJobId(
                     query.getUserId(), query.getUploadJobId(), pageable);
         } else {
-            photoPage = photoRepository.findByUserId(query.getUserId(), pageable);
+            photoPage = photoRepository.findByUser_Id(query.getUserId(), pageable);
         }
         
         // Convert to DTOs
@@ -85,6 +84,16 @@ public class GetUserPhotosHandler {
      * Convert Photo entity to PhotoResponse DTO
      */
     private PhotoResponse toPhotoResponse(Photo photo) {
+        // Map tags to DTOs
+        List<PhotoResponse.TagDto> tagDtos = photo.getTags() != null 
+            ? photo.getTags().stream()
+                .map(tag -> PhotoResponse.TagDto.builder()
+                    .id(tag.getId())
+                    .name(tag.getName())
+                    .build())
+                .collect(Collectors.toList())
+            : List.of();
+        
         return PhotoResponse.builder()
                 .id(photo.getId())
                 .userId(photo.getUser() != null ? photo.getUser().getId() : null)
@@ -97,6 +106,7 @@ public class GetUserPhotosHandler {
                 .retryCount(photo.getRetryCount())
                 .createdAt(photo.getCreatedAt())
                 .completedAt(photo.getCompletedAt())
+                .tags(tagDtos)
                 .build();
     }
     

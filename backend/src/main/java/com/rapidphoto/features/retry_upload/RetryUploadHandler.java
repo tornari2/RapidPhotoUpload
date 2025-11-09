@@ -40,7 +40,7 @@ public class RetryUploadHandler {
                 command.getPhotoId(), command.getUserId());
         
         // Find photo and verify ownership
-        Photo photo = photoRepository.findByIdAndUserId(command.getPhotoId(), command.getUserId())
+        Photo photo = photoRepository.findByIdAndUser_Id(command.getPhotoId(), command.getUserId())
                 .orElseThrow(() -> {
                     log.warn("Photo not found or access denied: photoId={}, userId={}", 
                             command.getPhotoId(), command.getUserId());

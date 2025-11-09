@@ -1,6 +1,6 @@
 # Task ID: 27
 # Title: Mobile Authentication System
-# Status: pending
+# Status: done
 # Dependencies: 19
 # Priority: high
 # Description: Implement JWT-based authentication for the React Native mobile app with integration to backend endpoints.
@@ -23,31 +23,31 @@
 6. Test biometric authentication setup and fallback mechanisms.
 
 # Subtasks:
-## 1. Create Authentication Context [pending]
+## 1. Create Authentication Context [done]
 ### Dependencies: None
 ### Description: Develop AuthContext.tsx to manage authentication state using React Context API.
 ### Details:
 Set up a new context in AuthContext.tsx to manage user authentication state, including login status and JWT token storage.
 
-## 2. Develop Login Screen [pending]
+## 2. Develop Login Screen [done]
 ### Dependencies: 27.1
 ### Description: Implement LoginScreen.tsx with modern dark theme and gradient buttons.
 ### Details:
 Create a login interface in LoginScreen.tsx following the design guidelines, ensuring proper input handling and validation.
 
-## 3. Develop Registration Screen [pending]
+## 3. Develop Registration Screen [done]
 ### Dependencies: 27.1
 ### Description: Implement RegisterScreen.tsx with consistent UI design.
 ### Details:
 Create a registration interface in RegisterScreen.tsx, ensuring it matches the login screen's design and handles input validation.
 
-## 4. Implement Authentication Service [pending]
+## 4. Implement Authentication Service [done]
 ### Dependencies: 27.1
 ### Description: Develop authService.ts to handle API calls for authentication.
 ### Details:
 Create authService.ts to manage API interactions for login, registration, and token refresh using existing backend endpoints.
 
-## 5. Secure Token Storage and Route Protection [pending]
+## 5. Secure Token Storage and Route Protection [done]
 ### Dependencies: 27.1, 27.4
 ### Description: Use secure storage for tokens and protect routes based on authentication state.
 ### Details:

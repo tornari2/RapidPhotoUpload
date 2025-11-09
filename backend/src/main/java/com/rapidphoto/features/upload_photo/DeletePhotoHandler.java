@@ -33,7 +33,7 @@ public class DeletePhotoHandler {
         log.info("Deleting photo: {} for user: {}", command.getPhotoId(), command.getUserId());
         
         // Verify photo exists and belongs to user
-        Photo photo = photoRepository.findByIdAndUserId(command.getPhotoId(), command.getUserId())
+        Photo photo = photoRepository.findByIdAndUser_Id(command.getPhotoId(), command.getUserId())
                 .orElseThrow(() -> {
                     log.warn("Photo not found or access denied: photoId={}, userId={}", 
                             command.getPhotoId(), command.getUserId());

@@ -5,6 +5,7 @@ import type {
   BulkTagPhotosRequest,
   BulkTagPhotosResponse,
 } from '../types/tag';
+import { retryApiCall } from '../utils/retryUtils';
 
 /**
  * Service for tag-related API calls
@@ -14,16 +15,20 @@ export const tagService = {
    * Tag a single photo with one or more tags
    */
   async tagPhoto(request: TagPhotoRequest): Promise<TagPhotoResponse> {
-    const response = await apiClient.post<TagPhotoResponse>('/photos/tag', request);
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.post<TagPhotoResponse>('/photos/tag', request);
+      return response.data;
+    });
   },
 
   /**
    * Bulk tag multiple photos with the same set of tags
    */
   async bulkTagPhotos(request: BulkTagPhotosRequest): Promise<BulkTagPhotosResponse> {
-    const response = await apiClient.post<BulkTagPhotosResponse>('/photos/bulk-tag', request);
-    return response.data;
+    return retryApiCall(async () => {
+      const response = await apiClient.post<BulkTagPhotosResponse>('/photos/bulk-tag', request);
+      return response.data;
+    });
   },
 };
 
