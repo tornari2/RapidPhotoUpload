@@ -1,0 +1,95 @@
+# Task ID: 13
+# Title: Authentication Flow
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Implement JWT-based authentication system.
+# Details:
+Develop login endpoint to issue JWT tokens. Implement middleware for token validation on protected endpoints.
+<info added on 2025-11-07T20:44:08.807Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/features/auth/AuthController.java (login endpoint)
+- Create: backend/src/main/java/com/rapidphoto/features/auth/AuthService.java (JWT token generation)
+- Create: backend/src/main/java/com/rapidphoto/infrastructure/security/JwtTokenProvider.java (JWT utilities)
+- Create: backend/src/main/java/com/rapidphoto/infrastructure/security/JwtAuthenticationFilter.java (JWT filter)
+- Create: backend/src/main/java/com/rapidphoto/infrastructure/config/SecurityConfig.java (Spring Security config)
+- Modify: backend/src/main/resources/application.properties (add JWT secret)
+- Create: backend/src/test/java/com/rapidphoto/features/auth/AuthIntegrationTest.java
+</info added on 2025-11-07T20:44:08.807Z>
+
+# Test Strategy:
+Test authentication flow and token validation across endpoints.
+
+# Subtasks:
+## 1. Design JWT Authentication Flow [done]
+### Dependencies: None
+### Description: Design the overall JWT authentication flow including login and token validation.
+### Details:
+Create a flowchart or diagram to outline the JWT authentication process, including login endpoint and middleware for token validation.
+<info added on 2025-11-07T22:47:41.268Z>
+Completed JWT Authentication Flow Design:
+
+Created comprehensive design document at `backend/docs/JWT_AUTHENTICATION_DESIGN.md` covering:
+
+1. **Authentication Flows**:
+   - Login flow diagram (text-based)
+   - Protected endpoint access flow
+   - Token refresh flow (future enhancement)
+
+2. **Component Architecture**:
+   - JwtTokenProvider: Token generation, validation, claim extraction
+   - JwtAuthenticationFilter: Request interception and token validation
+   - SecurityConfig: Spring Security configuration
+   - AuthController: Login endpoint
+   - AuthService: Authentication business logic
+
+3. **Token Structure**:
+   - HS256 algorithm
+   - Claims: sub (user UUID), username, iat, exp
+   - 1-hour expiration (configurable)
+
+4. **Security Considerations**:
+   - BCrypt password hashing
+   - HTTPS requirement for production
+   - Token storage recommendations
+   - CORS configuration
+   - Rate limiting considerations
+
+5. **API Design**:
+   - POST /api/auth/login endpoint specification
+   - Request/response DTOs
+   - Error handling patterns
+
+6. **Implementation Sequence**:
+   - Step-by-step implementation order
+   - Testing strategy
+   - Future enhancements
+
+The design is ready for implementation. All components are clearly defined with responsibilities, methods, and security considerations.
+</info added on 2025-11-07T22:47:41.268Z>
+
+## 2. Develop Login Endpoint [done]
+### Dependencies: 13.1
+### Description: Create the login endpoint to issue JWT tokens upon successful authentication.
+### Details:
+Implement a REST API endpoint for user login. Validate user credentials and issue a JWT token upon successful authentication.
+
+## 3. Implement JWT Middleware [done]
+### Dependencies: 13.2
+### Description: Develop middleware to validate JWT tokens on protected endpoints.
+### Details:
+Create middleware to intercept requests to protected endpoints, validate JWT tokens, and handle unauthorized access.
+
+## 4. Configure Token Expiry and Refresh [done]
+### Dependencies: 13.3
+### Description: Set up token expiry and implement token refresh mechanism.
+### Details:
+Define token expiry time and implement a refresh token mechanism to issue new tokens without requiring re-login.
+
+## 5. Integrate Authentication Flow with Application [done]
+### Dependencies: 13.4
+### Description: Integrate the JWT authentication flow with the existing application infrastructure.
+### Details:
+Ensure all protected endpoints are secured with JWT validation and update application routes accordingly.
+

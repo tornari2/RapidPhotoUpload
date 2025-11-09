@@ -1,0 +1,62 @@
+# Task ID: 4
+# Title: AWS S3 Integration
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Integrate AWS S3 for direct uploads using presigned URLs.
+# Details:
+Implement S3Service for presigned URL generation. Configure bucket and permissions in AWS.
+<info added on 2025-11-07T20:43:25.554Z>
+Files to create/modify:
+- Create: `backend/src/main/java/com/rapidphoto/infrastructure/s3/S3Service.java` for S3 service interface and implementation.
+- Create: `backend/src/main/java/com/rapidphoto/infrastructure/s3/PresignedUrlGenerator.java` for presigned URL generation.
+- Create: `backend/src/main/java/com/rapidphoto/infrastructure/config/S3Config.java` for S3 client configuration.
+- Modify: `backend/src/main/resources/application.properties` to add AWS S3 bucket name and region.
+- Create: `backend/src/test/java/com/rapidphoto/infrastructure/s3/S3ServiceTest.java` for integration tests.
+</info added on 2025-11-07T20:43:25.554Z>
+
+# Test Strategy:
+Integration test for presigned URL generation and S3 upload.
+
+# Subtasks:
+## 1. Set Up AWS S3 Bucket and Permissions [done]
+### Dependencies: None
+### Description: Create and configure an S3 bucket with appropriate permissions.
+### Details:
+Log into AWS, create a new S3 bucket, and set permissions to allow presigned URL uploads.
+
+## 2. Implement S3Service for Presigned URL Generation [done]
+### Dependencies: 4.1
+### Description: Develop a service to generate presigned URLs for S3 uploads.
+### Details:
+Create a Java service using AWS SDK to generate presigned URLs for the configured S3 bucket.
+<info added on 2025-11-07T21:15:56.377Z>
+Implemented S3Service and PresignedUrlGenerator:
+- PresignedUrlGenerator: Generates presigned URLs for uploads (PUT) and downloads (GET)
+- S3Service interface: Defines contract for S3 operations
+- S3ServiceImpl: Implementation using PresignedUrlGenerator
+- S3 key format: uploads/{userId}/{photoId}-{filename} (matches PRD requirement)
+- Filename sanitization to prevent path traversal attacks
+- File existence verification using headObject
+- 15-minute URL expiration (configurable)
+- Proper resource management with try-with-resources for S3Presigner
+</info added on 2025-11-07T21:15:56.377Z>
+
+## 3. Integrate S3Service into Application [done]
+### Dependencies: 4.2
+### Description: Integrate the S3Service into the existing application architecture.
+### Details:
+Wire the S3Service into the application, ensuring it can be accessed where needed.
+
+## 4. Configure Application Properties for AWS [done]
+### Dependencies: 4.1
+### Description: Set up application properties for AWS credentials and S3 bucket details.
+### Details:
+Add AWS credentials and S3 bucket details to application properties or environment variables.
+
+## 5. Conduct Integration Testing for S3 Uploads [done]
+### Dependencies: 4.3, 4.4
+### Description: Perform integration testing for the S3 upload functionality using presigned URLs.
+### Details:
+Test the complete flow from URL generation to file upload to S3, ensuring all components work together.
+

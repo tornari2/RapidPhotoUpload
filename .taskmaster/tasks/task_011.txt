@@ -1,0 +1,52 @@
+# Task ID: 11
+# Title: Download Endpoint
+# Status: done
+# Dependencies: 9
+# Priority: medium
+# Description: Implement endpoint for generating presigned download URLs.
+# Details:
+Develop DownloadPhotoQuery and handler to generate presigned URLs for photo downloads.
+<info added on 2025-11-07T20:44:03.807Z>
+Files to create/modify:
+
+- Create: `backend/src/main/java/com/rapidphoto/features/download-photo/DownloadPhotoQuery.java`
+- Create: `backend/src/main/java/com/rapidphoto/features/download-photo/DownloadPhotoHandler.java`
+- Create: `backend/src/main/java/com/rapidphoto/features/download-photo/DownloadPhotoController.java`
+- Modify: `backend/src/main/java/com/rapidphoto/infrastructure/s3/S3Service.java` to add a method for generating presigned download URLs.
+- Create: `backend/src/test/java/com/rapidphoto/features/download-photo/DownloadPhotoIntegrationTest.java` for integration testing of the download functionality.
+</info added on 2025-11-07T20:44:03.807Z>
+
+# Test Strategy:
+Integration test for download URL generation and S3 access.
+
+# Subtasks:
+## 1. Design DownloadPhotoQuery [done]
+### Dependencies: None
+### Description: Design the DownloadPhotoQuery to handle presigned URL requests.
+### Details:
+Create a query object to encapsulate parameters needed for generating presigned URLs.
+
+## 2. Implement DownloadPhotoQuery [done]
+### Dependencies: 11.1
+### Description: Develop the DownloadPhotoQuery to generate presigned URLs.
+### Details:
+Write code to implement the query logic for generating presigned URLs using AWS SDK.
+
+## 3. Create Handler for DownloadPhotoQuery [done]
+### Dependencies: 11.2
+### Description: Develop a handler to process DownloadPhotoQuery requests.
+### Details:
+Implement a handler that processes the query and returns the presigned URL.
+
+## 4. Integrate Endpoint with Application [done]
+### Dependencies: 11.3
+### Description: Integrate the download endpoint into the existing application framework.
+### Details:
+Add the endpoint to the application routes and ensure it is accessible.
+
+## 5. Conduct Integration Testing [done]
+### Dependencies: 11.4
+### Description: Perform integration testing for the download endpoint.
+### Details:
+Test the complete flow from request to presigned URL generation and S3 access.
+

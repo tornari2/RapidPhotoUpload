@@ -1,0 +1,54 @@
+# Task ID: 17
+# Title: Web Tagging System
+# Status: done
+# Dependencies: 16, 10
+# Priority: medium
+# Description: Develop tagging system for web interface.
+# Details:
+Implement tag input component, add tags to photos, and display tags on grid items.
+<info added on 2025-11-07T20:44:38.401Z>
+Files to create/modify:
+
+- Create: web-app/src/components/Tagging/TagInput.tsx (tag input component)
+- Create: web-app/src/components/Tagging/TagDisplay.tsx (tag display component)
+- Create: web-app/src/components/Tagging/BulkTagModal.tsx (bulk tagging modal)
+- Create: web-app/src/hooks/useTags.ts (tagging logic hook)
+- Create: web-app/src/services/tagService.ts (API service for tags)
+- Create: web-app/src/types/tag.ts (TypeScript types)
+- Modify: web-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add tag display)
+</info added on 2025-11-07T20:44:38.401Z>
+
+# Test Strategy:
+Test tagging functionality and UI integration.
+
+# Subtasks:
+## 1. Design Tag Input Component [done]
+### Dependencies: None
+### Description: Create a user interface component for tag input.
+### Details:
+Design a UI component that allows users to input tags. Ensure it supports multiple tags and provides suggestions.
+
+## 2. Implement Tag Input Component [done]
+### Dependencies: 17.1
+### Description: Develop the tag input component based on the design.
+### Details:
+Use React to implement the tag input component. Ensure it integrates with the existing form structure.
+
+## 3. Add Tags to Photos [done]
+### Dependencies: 17.2
+### Description: Enable adding tags to photos in the system.
+### Details:
+Develop backend logic to associate tags with photo entries in the database. Update API endpoints as necessary.
+
+## 4. Display Tags on Grid Items [done]
+### Dependencies: 17.3
+### Description: Show tags on photo grid items in the UI.
+### Details:
+Modify the photo grid component to display tags beneath each photo. Ensure tags are styled appropriately.
+
+## 5. Integrate Tagging System with UI [done]
+### Dependencies: 17.4
+### Description: Integrate the entire tagging system with the web interface.
+### Details:
+Ensure the tagging system is fully integrated with the web interface, including input, display, and backend interactions.
+

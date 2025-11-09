@@ -1,0 +1,52 @@
+# Task ID: 12
+# Title: Retry Mechanism
+# Status: done
+# Dependencies: 7
+# Priority: medium
+# Description: Implement retry mechanism for failed uploads.
+# Details:
+Develop RetryFailedUploadCommand and handler to allow retrying failed uploads with new presigned URLs.
+<info added on 2025-11-07T20:44:05.495Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/features/retry-upload/RetryUploadCommand.java
+- Create: backend/src/main/java/com/rapidphoto/features/retry-upload/RetryUploadHandler.java
+- Create: backend/src/main/java/com/rapidphoto/features/retry-upload/RetryUploadController.java
+- Modify: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoController.java to add a retry endpoint
+- Create: backend/src/test/java/com/rapidphoto/features/retry-upload/RetryUploadIntegrationTest.java
+</info added on 2025-11-07T20:44:05.495Z>
+
+# Test Strategy:
+Integration test for retry logic and presigned URL regeneration.
+
+# Subtasks:
+## 1. Design RetryFailedUploadCommand [done]
+### Dependencies: None
+### Description: Design the command structure for retrying failed uploads.
+### Details:
+Define the command attributes and methods needed to handle retry logic.
+
+## 2. Implement RetryFailedUploadCommand [done]
+### Dependencies: 12.1
+### Description: Develop the command to handle retry logic for failed uploads.
+### Details:
+Code the command class, ensuring it can trigger retries with new presigned URLs.
+
+## 3. Develop Handler for Retry Command [done]
+### Dependencies: 12.2
+### Description: Create a handler to process the RetryFailedUploadCommand.
+### Details:
+Implement the handler logic to execute retries and manage state transitions.
+
+## 4. Integrate Presigned URL Regeneration [done]
+### Dependencies: 12.3
+### Description: Ensure new presigned URLs are generated during retries.
+### Details:
+Modify the handler to regenerate presigned URLs for each retry attempt.
+
+## 5. Conduct Integration Testing [done]
+### Dependencies: 12.4
+### Description: Perform integration testing for the entire retry mechanism.
+### Details:
+Test the retry logic, command handling, and URL regeneration in a full workflow.
+

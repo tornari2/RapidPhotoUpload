@@ -1,0 +1,54 @@
+# Task ID: 10
+# Title: Tag Management Endpoints
+# Status: done
+# Dependencies: 9
+# Priority: medium
+# Description: Implement endpoints for tagging photos.
+# Details:
+Develop TagPhotoCommand, BulkTagPhotosCommand, and handlers for adding and managing photo tags.
+<info added on 2025-11-07T20:44:01.043Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoCommand.java
+- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoHandler.java
+- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/BulkTagPhotosCommand.java
+- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/BulkTagPhotosHandler.java
+- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoController.java
+- Create: backend/src/main/java/com/rapidphoto/features/tag-photo/TagPhotoRepository.java
+- Create: backend/src/test/java/com/rapidphoto/features/tag-photo/TagPhotoIntegrationTest.java
+</info added on 2025-11-07T20:44:01.043Z>
+
+# Test Strategy:
+Integration tests for tagging operations and database updates.
+
+# Subtasks:
+## 1. Develop TagPhotoCommand [done]
+### Dependencies: None
+### Description: Create a command for tagging a single photo.
+### Details:
+Implement the TagPhotoCommand class to handle single photo tagging requests.
+
+## 2. Develop BulkTagPhotosCommand [done]
+### Dependencies: 10.1
+### Description: Create a command for tagging multiple photos at once.
+### Details:
+Implement the BulkTagPhotosCommand class to handle requests for tagging multiple photos.
+
+## 3. Implement TagPhotoCommand Handler [done]
+### Dependencies: 10.1
+### Description: Create a handler for processing TagPhotoCommand requests.
+### Details:
+Develop a handler to execute the TagPhotoCommand and update the database accordingly.
+
+## 4. Implement BulkTagPhotosCommand Handler [done]
+### Dependencies: 10.2
+### Description: Create a handler for processing BulkTagPhotosCommand requests.
+### Details:
+Develop a handler to execute the BulkTagPhotosCommand and update the database accordingly.
+
+## 5. Develop Tag Management API Endpoints [done]
+### Dependencies: 10.3, 10.4
+### Description: Create API endpoints for tagging operations.
+### Details:
+Implement RESTful API endpoints to expose tagging functionalities to clients.
+

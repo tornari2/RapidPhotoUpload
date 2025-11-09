@@ -1,0 +1,61 @@
+# Task ID: 1
+# Title: Project Setup
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Initialize Spring Boot project with necessary configurations.
+# Details:
+Set up Spring Boot 3.x project with dependencies for AWS SDK, PostgreSQL, and SSE. Configure Elastic Beanstalk deployment files and database connection.
+<info added on 2025-11-07T20:43:14.458Z>
+Files to create/modify:
+
+- Create: `backend/pom.xml` for Maven dependencies.
+- Create: `backend/src/main/java/com/rapidphoto/RapidPhotoUploadApplication.java` for the main Spring Boot class.
+- Create: `backend/src/main/resources/application.properties` for database connection and AWS configuration.
+- Create: `backend/.ebextensions/environment.config` for Elastic Beanstalk environment variables.
+- Create: `backend/.ebextensions/01_java.config` for Java version configuration.
+- Create: `backend/src/main/java/com/rapidphoto/infrastructure/config/WebConfig.java` for SSE CORS configuration.
+- Modify: `backend/pom.xml` to add Spring Web, AWS SDK, and PostgreSQL dependencies.
+</info added on 2025-11-07T20:43:14.458Z>
+
+# Test Strategy:
+Verify project builds and runs locally. Check AWS SDK and database connection.
+
+# Subtasks:
+## 1. Initialize Spring Boot Project [done]
+### Dependencies: None
+### Description: Create a new Spring Boot 3.x project.
+### Details:
+Use Spring Initializr to create a new project with Spring Boot 3.x.
+<info added on 2025-11-07T20:51:09.877Z>
+Completed: Created Spring Boot 3.2.0 project structure with:
+- Main application class: RapidPhotoUploadApplication.java
+- Maven pom.xml with Spring Boot parent
+- Proper package structure: com.rapidphoto
+- All necessary directory structure created
+</info added on 2025-11-07T20:51:09.877Z>
+
+## 2. Add AWS SDK and PostgreSQL Dependencies [done]
+### Dependencies: 1.1
+### Description: Include AWS SDK and PostgreSQL dependencies in the project.
+### Details:
+Update the build configuration to include AWS SDK and PostgreSQL dependencies.
+
+## 3. Configure Database Connection [done]
+### Dependencies: 1.2
+### Description: Set up PostgreSQL database connection in the application.
+### Details:
+Add database connection properties to application.properties and configure DataSource.
+
+## 4. Set Up Server-Sent Events (SSE) [done]
+### Dependencies: 1.1
+### Description: Configure SSE in the Spring Boot application.
+### Details:
+Implement SSE endpoints and configure necessary settings in the application.
+
+## 5. Configure Elastic Beanstalk Deployment [done]
+### Dependencies: 1.3, 1.4
+### Description: Prepare Elastic Beanstalk deployment files.
+### Details:
+Create necessary configuration files for Elastic Beanstalk deployment, including environment settings.
+

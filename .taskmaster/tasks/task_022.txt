@@ -1,0 +1,53 @@
+# Task ID: 22
+# Title: Mobile Tagging System with Bulk Tagging
+# Status: pending
+# Dependencies: 21, 10
+# Priority: medium
+# Description: Develop tagging system for mobile app with single and bulk tagging capabilities.
+# Details:
+Implement tag input modal, add tags to photos, and display tags on grid items. Support single and bulk tagging.
+<info added on 2025-11-07T20:44:52.815Z>
+Files to create/modify:
+
+- Create: mobile-app/src/components/Tagging/TagInput.tsx (tag input modal)
+- Create: mobile-app/src/components/Tagging/TagDisplay.tsx (tag display)
+- Create: mobile-app/src/components/Tagging/BulkTagModal.tsx (bulk tag modal)
+- Create: mobile-app/src/hooks/useTags.ts (tagging logic hook)
+- Create: mobile-app/src/services/tagService.ts (API service)
+- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add tag display)
+</info added on 2025-11-07T20:44:52.815Z>
+
+# Test Strategy:
+Test tagging functionality and UI integration on mobile.
+
+# Subtasks:
+## 1. Design Tag Input Modal [pending]
+### Dependencies: None
+### Description: Create a design for the tag input modal in the mobile app.
+### Details:
+Design the UI for the tag input modal, ensuring it fits within the app's existing design language.
+
+## 2. Implement Tag Input Modal [pending]
+### Dependencies: 22.1
+### Description: Develop the tag input modal based on the design.
+### Details:
+Use React Native to implement the modal, allowing users to input tags.
+
+## 3. Add Tags to Photos [pending]
+### Dependencies: 22.2
+### Description: Enable users to add tags to photos within the app.
+### Details:
+Integrate the tag input modal with the photo component to allow tagging.
+
+## 4. Display Tags on Photo Grid [pending]
+### Dependencies: 22.3
+### Description: Show tags on photos within the grid view.
+### Details:
+Modify the photo grid component to display tags under each photo.
+
+## 5. Integrate Tagging with Backend [pending]
+### Dependencies: 22.4
+### Description: Connect the tagging system to the backend API.
+### Details:
+Ensure tags are saved and retrieved from the backend server.
+

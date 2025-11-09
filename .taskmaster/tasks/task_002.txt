@@ -1,0 +1,74 @@
+# Task ID: 2
+# Title: Domain Layer Implementation
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Implement core domain entities and value objects.
+# Details:
+Create User, Photo, UploadJob, and Tag entities. Implement value objects like UploadEvent and Tag. Define domain rules and validation logic.
+<info added on 2025-11-07T20:43:18.349Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/domain/User.java (User entity)
+- Create: backend/src/main/java/com/rapidphoto/domain/Photo.java (Photo entity)
+- Create: backend/src/main/java/com/rapidphoto/domain/UploadJob.java (UploadJob entity)
+- Create: backend/src/main/java/com/rapidphoto/domain/Tag.java (Tag entity)
+- Create: backend/src/main/java/com/rapidphoto/domain/UploadEvent.java (UploadEvent value object)
+- Create: backend/src/main/java/com/rapidphoto/domain/PhotoStatus.java (enum for photo status)
+- Create: backend/src/main/java/com/rapidphoto/domain/UploadJobStatus.java (enum for job status)
+</info added on 2025-11-07T20:43:18.349Z>
+
+# Test Strategy:
+Unit tests for domain entities and validation logic.
+
+# Subtasks:
+## 1. Create User Entity [done]
+### Dependencies: None
+### Description: Develop the User entity with necessary attributes and methods.
+### Details:
+Define attributes like userId, name, email, and methods for validation.
+
+## 2. Create Photo Entity [done]
+### Dependencies: 2.1
+### Description: Develop the Photo entity with necessary attributes and methods.
+### Details:
+Define attributes like photoId, userId, url, and methods for status updates.
+
+## 3. Create UploadJob Entity [done]
+### Dependencies: 2.1, 2.2
+### Description: Develop the UploadJob entity with necessary attributes and methods.
+### Details:
+Define attributes like jobId, userId, photoIds, and methods for job status management.
+
+## 4. Create Tag Entity and Value Object [done]
+### Dependencies: 2.1, 2.2
+### Description: Develop the Tag entity and Tag value object with necessary attributes and methods.
+### Details:
+Define attributes like tagId, name for entity and value object, and methods for tag management.
+
+## 5. Implement Domain Rules and Validation Logic [done]
+### Dependencies: 2.1, 2.2, 2.3, 2.4
+### Description: Define domain rules and validation logic for entities and value objects.
+### Details:
+Implement rules for entity relationships and validation logic for data integrity.
+<info added on 2025-11-07T20:58:05.162Z>
+✅ Completed: Implemented domain rules and validation logic:
+- Photo immutability rule: Photos cannot be modified once completed
+- UploadJob status transitions: Automatic status updates based on completion/failure counts
+- Retry logic: Only failed photos can be retried, with max retry count validation
+- User ownership: Photos belong to users, with ownership validation methods
+- Tag normalization: Tag names are automatically normalized to lowercase
+- Validation annotations: All entities use Jakarta Validation annotations
+- Business logic methods: Each entity has domain-specific methods for state management
+</info added on 2025-11-07T20:58:05.162Z>
+<info added on 2025-11-07T21:05:07.473Z>
+✅ Unit Tests Created:
+- UserTest.java: Tests for user creation, validation, and canPerformOperations() method
+- PhotoTest.java: Tests for photo creation, status transitions, retry logic, and ownership validation
+- UploadJobTest.java: Tests for job creation, status transitions, progress calculation, and completion logic
+- TagTest.java: Tests for tag creation and name normalization
+- UploadEventTest.java: Tests for event factory methods and event type enum
+
+All tests cover domain rules and validation logic as specified in the test strategy.
+</info added on 2025-11-07T21:05:07.473Z>
+

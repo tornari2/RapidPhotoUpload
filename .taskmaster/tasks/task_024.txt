@@ -1,0 +1,54 @@
+# Task ID: 24
+# Title: AWS Deployment
+# Status: pending
+# Dependencies: 12
+# Priority: medium
+# Description: Deploy backend to AWS Elastic Beanstalk.
+# Details:
+Configure Elastic Beanstalk environment, deploy Spring Boot application, and set environment variables.
+<info added on 2025-11-07T20:44:56.969Z>
+Files to create/modify:
+
+- Create: `backend/.ebextensions/environment.config` for setting environment variables.
+- Create: `backend/.ebextensions/01_java.config` to specify the Java version.
+- Create: `backend/.ebextensions/02_postgres.config` for database connection settings.
+- Create: `backend/.ebextensions/03_s3.config` for S3 bucket configuration.
+- Modify: `backend/pom.xml` to ensure packaging is set to JAR.
+- Create: `backend/application-prod.properties` for production-specific properties.
+- Create: `backend/Procfile` if needed for Elastic Beanstalk deployment.
+</info added on 2025-11-07T20:44:56.969Z>
+
+# Test Strategy:
+Test deployed backend functionality and AWS integration.
+
+# Subtasks:
+## 1. Set Up AWS Elastic Beanstalk Environment [pending]
+### Dependencies: None
+### Description: Create and configure the Elastic Beanstalk environment for deployment.
+### Details:
+Initialize an Elastic Beanstalk environment suitable for a Spring Boot application. Configure necessary resources such as EC2 instances, load balancers, and security groups.
+
+## 2. Configure Environment Variables [pending]
+### Dependencies: 24.1
+### Description: Set necessary environment variables for the application.
+### Details:
+Identify and set all required environment variables in the Elastic Beanstalk console to ensure the application runs correctly.
+
+## 3. Deploy Spring Boot Application [pending]
+### Dependencies: 24.2
+### Description: Deploy the Spring Boot application to the configured Elastic Beanstalk environment.
+### Details:
+Package the Spring Boot application as a JAR file and upload it to Elastic Beanstalk for deployment.
+
+## 4. Configure Auto-scaling and Load Balancing [pending]
+### Dependencies: 24.3
+### Description: Set up auto-scaling and load balancing for the application.
+### Details:
+Configure auto-scaling rules and load balancing to handle varying loads efficiently. Adjust instance counts and scaling triggers as needed.
+
+## 5. Test Deployed Application Functionality [pending]
+### Dependencies: 24.4
+### Description: Test the functionality of the deployed application and its integration with AWS services.
+### Details:
+Perform end-to-end testing of the application to verify its functionality and integration with AWS services like RDS and S3.
+

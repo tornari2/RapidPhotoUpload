@@ -1,0 +1,58 @@
+# Task ID: 28
+# Title: Mobile App Deployment and Publishing
+# Status: pending
+# Dependencies: 19, 27
+# Priority: medium
+# Description: Prepare and deploy the React Native mobile app to app stores and configure it for production use.
+# Details:
+1. Modify `mobile-app/app.json` or `app.config.js` to include production settings such as app name, bundle identifiers, version, icons, and splash screens.
+2. Create production build configurations for both iOS and Android platforms.
+3. Set up EAS Build (Expo Application Services) for cloud builds by creating `mobile-app/eas.json`.
+4. Configure environment variables for production by creating `mobile-app/.env.production` to include the production API URL.
+5. Generate app icons and splash screens for both platforms and save them as `mobile-app/assets/icon.png` and `mobile-app/assets/splash.png`.
+6. Set up code signing certificates for iOS and a keystore for Android.
+7. Use EAS Build to create production builds.
+8. Test production builds on physical devices to ensure functionality.
+9. Prepare app store listings, including screenshots, descriptions, and privacy policy.
+10. Submit the app to the Apple App Store and Google Play Store.
+11. Optionally, set up a continuous deployment pipeline for automatic updates.
+
+# Test Strategy:
+1. Verify that the app.json or app.config.js contains correct production settings.
+2. Ensure that production builds are successfully created using EAS Build.
+3. Test the app on physical devices for both iOS and Android to check for any issues.
+4. Confirm that the app store listings are complete and accurate.
+5. Validate successful submission to both the Apple App Store and Google Play Store.
+6. If a continuous deployment pipeline is set up, test the pipeline for automatic updates.
+
+# Subtasks:
+## 1. Configure Production Settings [pending]
+### Dependencies: None
+### Description: Modify app.json or app.config.js for production settings.
+### Details:
+Update app name, bundle identifiers, version, icons, and splash screens in app.json or app.config.js.
+
+## 2. Set Up EAS Build [pending]
+### Dependencies: 28.1
+### Description: Create eas.json for cloud builds using EAS Build.
+### Details:
+Create mobile-app/eas.json to configure EAS Build for both iOS and Android platforms.
+
+## 3. Configure Environment Variables [pending]
+### Dependencies: 28.1
+### Description: Set up production environment variables.
+### Details:
+Create mobile-app/.env.production with production API URL and other necessary variables.
+
+## 4. Generate App Icons and Splash Screens [pending]
+### Dependencies: 28.1
+### Description: Create and save app icons and splash screens for both platforms.
+### Details:
+Generate icons and splash screens, save as mobile-app/assets/icon.png and mobile-app/assets/splash.png.
+
+## 5. Prepare App Store Listings [pending]
+### Dependencies: 28.4
+### Description: Create app store listings with necessary details.
+### Details:
+Prepare screenshots, descriptions, and privacy policy for Apple App Store and Google Play Store.
+

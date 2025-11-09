@@ -1,0 +1,54 @@
+# Task ID: 9
+# Title: Photo Query Endpoints
+# Status: done
+# Dependencies: 7
+# Priority: medium
+# Description: Implement endpoints for querying photo data.
+# Details:
+Develop GetUserPhotosQuery, GetPhotoMetadataQuery, and associated handlers for retrieving photo data.
+<info added on 2025-11-07T20:43:46.218Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosQuery.java
+- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosHandler.java
+- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosController.java
+- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotosRepository.java
+- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotoMetadataQuery.java
+- Create: backend/src/main/java/com/rapidphoto/features/get-photos/GetPhotoMetadataHandler.java
+- Create: backend/src/test/java/com/rapidphoto/features/get-photos/GetPhotosIntegrationTest.java
+</info added on 2025-11-07T20:43:46.218Z>
+
+# Test Strategy:
+Integration tests for photo query endpoints and data retrieval.
+
+# Subtasks:
+## 1. Design GetUserPhotosQuery [done]
+### Dependencies: None
+### Description: Design the query to retrieve user-specific photos.
+### Details:
+Define the structure and parameters for GetUserPhotosQuery to fetch photos for a specific user.
+
+## 2. Implement GetUserPhotosQuery Handler [done]
+### Dependencies: 9.1
+### Description: Develop the handler for processing GetUserPhotosQuery.
+### Details:
+Create a handler that processes GetUserPhotosQuery and interacts with the database to retrieve user photos.
+
+## 3. Design GetPhotoMetadataQuery [done]
+### Dependencies: None
+### Description: Design the query to retrieve metadata for a specific photo.
+### Details:
+Define the structure and parameters for GetPhotoMetadataQuery to fetch photo metadata.
+
+## 4. Implement GetPhotoMetadataQuery Handler [done]
+### Dependencies: 9.3
+### Description: Develop the handler for processing GetPhotoMetadataQuery.
+### Details:
+Create a handler that processes GetPhotoMetadataQuery and retrieves metadata from the database.
+
+## 5. Integrate Queries with API Endpoints [done]
+### Dependencies: 9.2, 9.4
+### Description: Integrate the queries and handlers with the API endpoints.
+### Details:
+Set up API endpoints to handle requests for user photos and photo metadata, linking them to the respective handlers.
+

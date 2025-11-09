@@ -1,0 +1,55 @@
+# Task ID: 20
+# Title: Mobile Upload Feature with Real-Time Updates
+# Status: pending
+# Dependencies: 8, 19, 27
+# Priority: medium
+# Description: Develop mobile upload feature with progress indicators and real-time updates.
+# Details:
+Integrate image picker, implement upload logic with progress indicators, handle background uploads, and support 100 concurrent uploads using presigned S3 URLs.
+<info added on 2025-11-07T20:44:47.550Z>
+Files to create/modify:
+
+- Create: mobile-app/src/components/Upload/ImagePicker.tsx (image picker component)
+- Create: mobile-app/src/components/Upload/UploadProgress.tsx (progress indicator)
+- Create: mobile-app/src/components/Upload/BatchProgress.tsx (batch progress)
+- Create: mobile-app/src/hooks/useUpload.ts (upload logic hook)
+- Create: mobile-app/src/services/uploadService.ts (API service)
+- Create: mobile-app/src/services/sseService.ts (SSE client or polling fallback)
+- Create: mobile-app/src/types/upload.ts (TypeScript types)
+- Modify: mobile-app/src/App.tsx (add upload screen)
+</info added on 2025-11-07T20:44:47.550Z>
+
+# Test Strategy:
+Test mobile upload functionality, background behavior, and real-time updates.
+
+# Subtasks:
+## 1. Integrate Image Picker [pending]
+### Dependencies: None
+### Description: Add an image picker to the mobile app for selecting images to upload.
+### Details:
+Use react-native-image-picker to allow users to select images from their device.
+
+## 2. Implement Upload Logic with Presigned URLs [pending]
+### Dependencies: 20.1
+### Description: Develop the logic to upload images to the server using presigned S3 URLs.
+### Details:
+Create a function to handle image uploads using fetch or axios, ensuring proper error handling and retry mechanisms.
+
+## 3. Add Progress Indicators [pending]
+### Dependencies: 20.2
+### Description: Display upload progress to the user during the upload process.
+### Details:
+Implement a progress bar or percentage indicator to show upload progress using state management.
+
+## 4. Handle Background Uploads [pending]
+### Dependencies: 20.3
+### Description: Ensure uploads continue in the background if the app is minimized.
+### Details:
+Use libraries like react-native-background-upload to manage uploads when the app is not active.
+
+## 5. Integrate Real-Time Updates [pending]
+### Dependencies: 20.4
+### Description: Implement real-time upload progress updates using SSE or polling.
+### Details:
+Use react-native-sse or a polling fallback to provide real-time updates during uploads.
+

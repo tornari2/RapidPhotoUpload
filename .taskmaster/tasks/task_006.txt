@@ -1,0 +1,53 @@
+# Task ID: 6
+# Title: Upload Job Creation
+# Status: done
+# Dependencies: 2, 3, 4
+# Priority: medium
+# Description: Implement CreateUploadJobCommand and handler.
+# Details:
+Develop command to initialize upload jobs, create database entries, and generate presigned URLs for each photo.
+<info added on 2025-11-07T20:43:35.886Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoCommand.java (command model)
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/CreateUploadJobHandler.java (command handler)
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoController.java (REST controller)
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoRepository.java (data access)
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoValidator.java (validation)
+- Create: backend/src/test/java/com/rapidphoto/features/upload-photo/CreateUploadJobIntegrationTest.java (integration tests)
+</info added on 2025-11-07T20:43:35.886Z>
+
+# Test Strategy:
+Integration test for upload job creation and presigned URL generation.
+
+# Subtasks:
+## 1. Design CreateUploadJobCommand Interface [done]
+### Dependencies: None
+### Description: Define the interface for CreateUploadJobCommand.
+### Details:
+Create an interface specifying methods for initializing upload jobs and generating presigned URLs.
+
+## 2. Implement Command Logic [done]
+### Dependencies: 6.1
+### Description: Develop logic for CreateUploadJobCommand.
+### Details:
+Implement methods to initialize upload jobs and generate presigned URLs for each photo.
+
+## 3. Create Database Entries for Upload Jobs [done]
+### Dependencies: 6.2
+### Description: Implement database logic to store upload job details.
+### Details:
+Write code to insert new upload job records into the database.
+
+## 4. Generate Presigned URLs [done]
+### Dependencies: 6.2
+### Description: Develop functionality to generate presigned URLs for photos.
+### Details:
+Use AWS SDK to generate presigned URLs for each photo in the upload job.
+
+## 5. Integration Testing for Upload Job Creation [done]
+### Dependencies: 6.3, 6.4
+### Description: Conduct integration tests for the entire upload job creation process.
+### Details:
+Test the complete flow from command execution to database entry and URL generation.
+

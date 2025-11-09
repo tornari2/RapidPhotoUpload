@@ -1,0 +1,52 @@
+# Task ID: 25
+# Title: Frontend Deployment
+# Status: pending
+# Dependencies: 18
+# Priority: medium
+# Description: Deploy web frontend to hosting service.
+# Details:
+Build web app for production and deploy to Vercel/Netlify. Update API base URL to production.
+<info added on 2025-11-07T20:44:59.351Z>
+Files to create/modify:
+
+- Create: `web-app/vite.config.ts` for production build configuration.
+- Create: `web-app/.env.production` to specify the production API URL.
+- Create: `web-app/vercel.json` for Vercel deployment configuration or `netlify.toml` for Netlify configuration.
+- Modify: `web-app/package.json` to add a build script.
+- Create: `web-app/public/_redirects` for SPA routing if using Netlify.
+</info added on 2025-11-07T20:44:59.351Z>
+
+# Test Strategy:
+Test deployed web app functionality and integration with backend.
+
+# Subtasks:
+## 1. Prepare Production Build [pending]
+### Dependencies: None
+### Description: Build the web app for production using Vite.
+### Details:
+Run the build command to generate optimized production files.
+
+## 2. Update API Base URL [pending]
+### Dependencies: 25.1
+### Description: Change the API base URL to point to the production server.
+### Details:
+Modify the environment configuration to use the production API URL.
+
+## 3. Configure Hosting Service [pending]
+### Dependencies: 25.1
+### Description: Set up the hosting service for deployment.
+### Details:
+Choose Vercel or Netlify and configure the project settings.
+
+## 4. Deploy to Hosting Service [pending]
+### Dependencies: 25.2, 25.3
+### Description: Deploy the production build to the chosen hosting service.
+### Details:
+Upload the build files to Vercel or Netlify and initiate deployment.
+
+## 5. Test Deployed Application [pending]
+### Dependencies: 25.4
+### Description: Test the deployed web app for functionality and integration.
+### Details:
+Perform end-to-end testing to ensure the app works as expected.
+

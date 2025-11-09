@@ -1233,23 +1233,23 @@
       },
       {
         "id": 19,
-        "title": "Mobile Frontend Setup",
-        "description": "Initialize React Native project for mobile app.",
-        "details": "Set up React Native project with necessary dependencies and configure navigation.\n<info added on 2025-11-07T20:44:43.497Z>\nFiles to create/modify:\n- Create: mobile-app/package.json (React Native dependencies)\n- Create: mobile-app/tsconfig.json (TypeScript configuration)\n- Create: mobile-app/app.json (Expo configuration if using Expo)\n- Create: mobile-app/src/App.tsx (main app component)\n- Create: mobile-app/src/navigation/AppNavigator.tsx (React Navigation setup)\n- Create: mobile-app/babel.config.js (Babel configuration)\n- Create: mobile-app/metro.config.js (Metro bundler config)\n</info added on 2025-11-07T20:44:43.497Z>",
-        "testStrategy": "Verify project setup and basic navigation functionality.",
+        "title": "Mobile Frontend Setup with Expo",
+        "description": "Initialize React Native project using Expo for mobile app.",
+        "details": "Set up React Native project with Expo, configure navigation, and ensure compatibility with existing backend API.\n<info added on 2025-11-07T20:44:43.497Z>\nFiles to create/modify:\n- Create: mobile-app/package.json (React Native dependencies)\n- Create: mobile-app/tsconfig.json (TypeScript configuration)\n- Create: mobile-app/app.json (Expo configuration)\n- Create: mobile-app/src/App.tsx (main app component)\n- Create: mobile-app/src/navigation/AppNavigator.tsx (React Navigation setup)\n- Create: mobile-app/babel.config.js (Babel configuration)\n- Create: mobile-app/metro.config.js (Metro bundler config)\n</info added on 2025-11-07T20:44:43.497Z>",
+        "testStrategy": "Verify project setup, basic navigation functionality, and API integration.",
         "priority": "medium",
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
-            "title": "Initialize React Native Project",
-            "description": "Create a new React Native project using the CLI.",
+            "title": "Initialize React Native Project with Expo",
+            "description": "Create a new React Native project using Expo CLI.",
             "dependencies": [],
-            "details": "Use the React Native CLI to initialize a new project with default settings.",
-            "status": "pending",
+            "details": "Use the Expo CLI to initialize a new project with default settings.\n<info added on 2025-11-09T09:29:09.898Z>\nSuccessfully initialized React Native project with Expo using the blank-typescript template. Completed: - Created mobile-app/ directory at project root - Initialized Expo project with TypeScript support - Project builds and is ready for iOS and Android development - Created proper directory structure: src/{navigation,screens,components,hooks,services,contexts,types,utils}\n</info added on 2025-11-09T09:29:09.898Z>",
+            "status": "done",
             "testStrategy": "Ensure the project builds and runs on both iOS and Android emulators."
           },
           {
@@ -1260,7 +1260,7 @@
               1
             ],
             "details": "Install libraries such as React Navigation, Redux, and Axios using npm or yarn.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify that all dependencies are correctly installed and listed in package.json."
           },
           {
@@ -1271,7 +1271,7 @@
               2
             ],
             "details": "Implement a basic stack navigator and tab navigator for the app.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test navigation flow between screens to ensure it works as expected."
           },
           {
@@ -1282,7 +1282,7 @@
               2
             ],
             "details": "Create a Redux store and configure it with necessary middleware and reducers.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Check that the Redux store is accessible and state updates correctly."
           },
           {
@@ -1293,22 +1293,23 @@
               3,
               4
             ],
-            "details": "Create reusable components such as buttons, headers, and footers.",
-            "status": "pending",
+            "details": "Create reusable components such as buttons, headers, and footers with a modern dark theme and gradient buttons.",
+            "status": "done",
             "testStrategy": "Ensure components render correctly and are reusable across different screens."
           }
         ]
       },
       {
         "id": 20,
-        "title": "Mobile Upload Feature",
-        "description": "Develop mobile upload feature with progress indicators.",
-        "details": "Integrate image picker, implement upload logic with progress indicators, and handle background uploads.\n<info added on 2025-11-07T20:44:47.550Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Upload/ImagePicker.tsx (image picker component)\n- Create: mobile-app/src/components/Upload/UploadProgress.tsx (progress indicator)\n- Create: mobile-app/src/components/Upload/BatchProgress.tsx (batch progress)\n- Create: mobile-app/src/hooks/useUpload.ts (upload logic hook)\n- Create: mobile-app/src/services/uploadService.ts (API service)\n- Create: mobile-app/src/services/sseService.ts (SSE client or polling fallback)\n- Create: mobile-app/src/types/upload.ts (TypeScript types)\n- Modify: mobile-app/src/App.tsx (add upload screen)\n</info added on 2025-11-07T20:44:47.550Z>",
-        "testStrategy": "Test mobile upload functionality and background behavior.",
+        "title": "Mobile Upload Feature with Real-Time Updates",
+        "description": "Develop mobile upload feature with progress indicators and real-time updates.",
+        "details": "Integrate image picker, implement upload logic with progress indicators, handle background uploads, and support 100 concurrent uploads using presigned S3 URLs.\n<info added on 2025-11-07T20:44:47.550Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Upload/ImagePicker.tsx (image picker component)\n- Create: mobile-app/src/components/Upload/UploadProgress.tsx (progress indicator)\n- Create: mobile-app/src/components/Upload/BatchProgress.tsx (batch progress)\n- Create: mobile-app/src/hooks/useUpload.ts (upload logic hook)\n- Create: mobile-app/src/services/uploadService.ts (API service)\n- Create: mobile-app/src/services/sseService.ts (SSE client or polling fallback)\n- Create: mobile-app/src/types/upload.ts (TypeScript types)\n- Modify: mobile-app/src/App.tsx (add upload screen)\n</info added on 2025-11-07T20:44:47.550Z>",
+        "testStrategy": "Test mobile upload functionality, background behavior, and real-time updates.",
         "priority": "medium",
         "dependencies": [
+          8,
           19,
-          8
+          "27"
         ],
         "status": "pending",
         "subtasks": [
@@ -1317,18 +1318,18 @@
             "title": "Integrate Image Picker",
             "description": "Add an image picker to the mobile app for selecting images to upload.",
             "dependencies": [],
-            "details": "Use a library like react-native-image-picker to allow users to select images from their device.",
+            "details": "Use react-native-image-picker to allow users to select images from their device.",
             "status": "pending",
             "testStrategy": "Test image selection on various devices."
           },
           {
             "id": 2,
-            "title": "Implement Upload Logic",
-            "description": "Develop the logic to upload images to the server.",
+            "title": "Implement Upload Logic with Presigned URLs",
+            "description": "Develop the logic to upload images to the server using presigned S3 URLs.",
             "dependencies": [
               1
             ],
-            "details": "Create a function to handle image uploads using fetch or axios, ensuring proper error handling.",
+            "details": "Create a function to handle image uploads using fetch or axios, ensuring proper error handling and retry mechanisms.",
             "status": "pending",
             "testStrategy": "Test image upload with different file sizes and network conditions."
           },
@@ -1356,26 +1357,23 @@
           },
           {
             "id": 5,
-            "title": "Integrate with Existing UI",
-            "description": "Connect the upload feature with the existing mobile app UI.",
+            "title": "Integrate Real-Time Updates",
+            "description": "Implement real-time upload progress updates using SSE or polling.",
             "dependencies": [
-              1,
-              2,
-              3,
               4
             ],
-            "details": "Ensure the upload button and progress indicators are integrated into the current app design.",
+            "details": "Use react-native-sse or a polling fallback to provide real-time updates during uploads.",
             "status": "pending",
-            "testStrategy": "Test UI integration and user flow for the upload feature."
+            "testStrategy": "Test real-time updates for accuracy and performance."
           }
         ]
       },
       {
         "id": 21,
-        "title": "Mobile Photo Grid",
-        "description": "Implement photo grid view for mobile app.",
-        "details": "Develop FlatList for displaying photo thumbnails with pull-to-refresh and multi-select capabilities.\n<info added on 2025-11-07T20:44:49.594Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/PhotoGrid/PhotoGrid.tsx (FlatList grid component)\n- Create: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (thumbnail component)\n- Create: mobile-app/src/components/PhotoGrid/PhotoViewer.tsx (full-size photo viewer)\n- Create: mobile-app/src/hooks/usePhotos.ts (photo fetching hook)\n- Create: mobile-app/src/services/photoService.ts (API service)\n- Modify: mobile-app/src/App.tsx (add photo grid screen)\n</info added on 2025-11-07T20:44:49.594Z>",
-        "testStrategy": "Test grid rendering and interaction on mobile devices.",
+        "title": "Mobile Photo Grid with Infinite Scroll",
+        "description": "Implement photo grid view for mobile app with infinite scroll.",
+        "details": "Develop FlatList for displaying photo thumbnails with infinite scroll, pull-to-refresh, and multi-select capabilities.\n<info added on 2025-11-07T20:44:49.594Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/PhotoGrid/PhotoGrid.tsx (FlatList grid component)\n- Create: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (thumbnail component)\n- Create: mobile-app/src/components/PhotoGrid/PhotoViewer.tsx (full-size photo viewer)\n- Create: mobile-app/src/hooks/usePhotos.ts (photo fetching hook)\n- Create: mobile-app/src/services/photoService.ts (API service)\n- Modify: mobile-app/src/App.tsx (add photo grid screen)\n</info added on 2025-11-07T20:44:49.594Z>",
+        "testStrategy": "Test grid rendering, interaction, and infinite scroll on mobile devices.",
         "priority": "medium",
         "dependencies": [
           20
@@ -1384,8 +1382,8 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Set Up FlatList Component",
-            "description": "Initialize and configure FlatList for displaying photo thumbnails.",
+            "title": "Set Up FlatList Component with Infinite Scroll",
+            "description": "Initialize and configure FlatList for displaying photo thumbnails with infinite scroll.",
             "dependencies": [],
             "details": "Create a FlatList component in the mobile app to display photo thumbnails. Ensure it is scrollable and optimized for performance.",
             "status": "pending",
@@ -1415,12 +1413,12 @@
           },
           {
             "id": 4,
-            "title": "Integrate Photo Data Source",
-            "description": "Connect FlatList to a real data source for photos.",
+            "title": "Integrate Photo Data Source with Infinite Scroll",
+            "description": "Connect FlatList to a real data source for photos with infinite scroll.",
             "dependencies": [
               1
             ],
-            "details": "Fetch photo data from the backend or local storage and bind it to the FlatList component.",
+            "details": "Fetch photo data from the backend or local storage and bind it to the FlatList component with infinite scroll support.",
             "status": "pending",
             "testStrategy": "Ensure photos are fetched and displayed correctly in the grid."
           },
@@ -1440,9 +1438,9 @@
       },
       {
         "id": 22,
-        "title": "Mobile Tagging System",
-        "description": "Develop tagging system for mobile app.",
-        "details": "Implement tag input modal, add tags to photos, and display tags on grid items.\n<info added on 2025-11-07T20:44:52.815Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Tagging/TagInput.tsx (tag input modal)\n- Create: mobile-app/src/components/Tagging/TagDisplay.tsx (tag display)\n- Create: mobile-app/src/components/Tagging/BulkTagModal.tsx (bulk tag modal)\n- Create: mobile-app/src/hooks/useTags.ts (tagging logic hook)\n- Create: mobile-app/src/services/tagService.ts (API service)\n- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add tag display)\n</info added on 2025-11-07T20:44:52.815Z>",
+        "title": "Mobile Tagging System with Bulk Tagging",
+        "description": "Develop tagging system for mobile app with single and bulk tagging capabilities.",
+        "details": "Implement tag input modal, add tags to photos, and display tags on grid items. Support single and bulk tagging.\n<info added on 2025-11-07T20:44:52.815Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Tagging/TagInput.tsx (tag input modal)\n- Create: mobile-app/src/components/Tagging/TagDisplay.tsx (tag display)\n- Create: mobile-app/src/components/Tagging/BulkTagModal.tsx (bulk tag modal)\n- Create: mobile-app/src/hooks/useTags.ts (tagging logic hook)\n- Create: mobile-app/src/services/tagService.ts (API service)\n- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add tag display)\n</info added on 2025-11-07T20:44:52.815Z>",
         "testStrategy": "Test tagging functionality and UI integration on mobile.",
         "priority": "medium",
         "dependencies": [
@@ -1508,9 +1506,9 @@
       },
       {
         "id": 23,
-        "title": "Mobile Download Feature",
-        "description": "Implement download functionality for mobile app.",
-        "details": "Develop download feature to save photos to device with progress indicators.\n<info added on 2025-11-07T20:44:54.608Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Download/DownloadButton.tsx (download button)\n- Create: mobile-app/src/components/Download/BulkDownload.tsx (bulk download)\n- Create: mobile-app/src/hooks/useDownload.ts (download logic hook)\n- Create: mobile-app/src/services/downloadService.ts (API service)\n- Create: mobile-app/src/utils/fileSystem.ts (save to device utilities)\n- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add download button)\n</info added on 2025-11-07T20:44:54.608Z>",
+        "title": "Mobile Download Feature with Progress Indicators",
+        "description": "Implement download functionality for mobile app with progress indicators.",
+        "details": "Develop download feature to save photos to device with progress indicators and proper error handling.\n<info added on 2025-11-07T20:44:54.608Z>\nFiles to create/modify:\n\n- Create: mobile-app/src/components/Download/DownloadButton.tsx (download button)\n- Create: mobile-app/src/components/Download/BulkDownload.tsx (bulk download)\n- Create: mobile-app/src/hooks/useDownload.ts (download logic hook)\n- Create: mobile-app/src/services/downloadService.ts (API service)\n- Create: mobile-app/src/utils/fileSystem.ts (save to device utilities)\n- Modify: mobile-app/src/components/PhotoGrid/PhotoThumbnail.tsx (add download button)\n</info added on 2025-11-07T20:44:54.608Z>",
         "testStrategy": "Test download functionality and success notifications on mobile.",
         "priority": "medium",
         "dependencies": [
@@ -1533,12 +1531,12 @@
           },
           {
             "id": 2,
-            "title": "Implement Download Logic",
-            "description": "Develop the logic to download photos to the device.",
+            "title": "Implement Download Logic with Error Handling",
+            "description": "Develop the logic to download photos to the device with error handling.",
             "dependencies": [
               1
             ],
-            "details": "Write code to handle file downloads and manage storage permissions.",
+            "details": "Write code to handle file downloads and manage storage permissions, including retry mechanisms.",
             "status": "pending",
             "testStrategy": "Test download logic with various file sizes."
           },
@@ -1725,11 +1723,147 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "Mobile Authentication System",
+        "description": "Implement JWT-based authentication for the React Native mobile app with integration to backend endpoints.",
+        "details": "1. Create `mobile-app/src/contexts/AuthContext.tsx` to manage authentication state using React Context API.\n2. Develop `mobile-app/src/screens/LoginScreen.tsx` for the login interface, ensuring it matches the modern dark theme with gradient buttons.\n3. Develop `mobile-app/src/screens/RegisterScreen.tsx` for user registration, following the same UI guidelines.\n4. Implement `mobile-app/src/services/authService.ts` to handle API calls for login, registration, and token refresh using existing backend endpoints.\n5. Use `expo-secure-store` or `AsyncStorage` for secure token storage.\n6. Implement logic to handle token refresh automatically.\n7. Protect routes/screens by checking authentication state and redirecting unauthenticated users.\n8. Add optional biometric authentication support using Face ID/Touch ID.",
+        "testStrategy": "1. Verify authentication state management by logging in and checking token storage.\n2. Test login and registration screens for UI consistency and functionality.\n3. Ensure API integration by checking network requests during login, registration, and token refresh.\n4. Test secure token storage and retrieval.\n5. Validate protected routes by attempting access without authentication.\n6. Test biometric authentication setup and fallback mechanisms.",
+        "status": "done",
+        "dependencies": [
+          19
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Authentication Context",
+            "description": "Develop AuthContext.tsx to manage authentication state using React Context API.",
+            "dependencies": [],
+            "details": "Set up a new context in AuthContext.tsx to manage user authentication state, including login status and JWT token storage.",
+            "status": "done",
+            "testStrategy": "Verify state management by simulating login and checking state updates."
+          },
+          {
+            "id": 2,
+            "title": "Develop Login Screen",
+            "description": "Implement LoginScreen.tsx with modern dark theme and gradient buttons.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a login interface in LoginScreen.tsx following the design guidelines, ensuring proper input handling and validation.",
+            "status": "done",
+            "testStrategy": "Test UI consistency and functionality by attempting login with valid/invalid credentials."
+          },
+          {
+            "id": 3,
+            "title": "Develop Registration Screen",
+            "description": "Implement RegisterScreen.tsx with consistent UI design.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a registration interface in RegisterScreen.tsx, ensuring it matches the login screen's design and handles input validation.",
+            "status": "done",
+            "testStrategy": "Test registration process with various input scenarios to ensure proper validation and error handling."
+          },
+          {
+            "id": 4,
+            "title": "Implement Authentication Service",
+            "description": "Develop authService.ts to handle API calls for authentication.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create authService.ts to manage API interactions for login, registration, and token refresh using existing backend endpoints.",
+            "status": "done",
+            "testStrategy": "Ensure API calls are correctly made and responses are handled by simulating network requests."
+          },
+          {
+            "id": 5,
+            "title": "Secure Token Storage and Route Protection",
+            "description": "Use secure storage for tokens and protect routes based on authentication state.",
+            "dependencies": [
+              1,
+              4
+            ],
+            "details": "Implement token storage using expo-secure-store or AsyncStorage and add logic to protect routes, redirecting unauthenticated users.",
+            "status": "done",
+            "testStrategy": "Test secure token storage and route protection by checking access control and token persistence."
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "title": "Mobile App Deployment and Publishing",
+        "description": "Prepare and deploy the React Native mobile app to app stores and configure it for production use.",
+        "details": "1. Modify `mobile-app/app.json` or `app.config.js` to include production settings such as app name, bundle identifiers, version, icons, and splash screens.\n2. Create production build configurations for both iOS and Android platforms.\n3. Set up EAS Build (Expo Application Services) for cloud builds by creating `mobile-app/eas.json`.\n4. Configure environment variables for production by creating `mobile-app/.env.production` to include the production API URL.\n5. Generate app icons and splash screens for both platforms and save them as `mobile-app/assets/icon.png` and `mobile-app/assets/splash.png`.\n6. Set up code signing certificates for iOS and a keystore for Android.\n7. Use EAS Build to create production builds.\n8. Test production builds on physical devices to ensure functionality.\n9. Prepare app store listings, including screenshots, descriptions, and privacy policy.\n10. Submit the app to the Apple App Store and Google Play Store.\n11. Optionally, set up a continuous deployment pipeline for automatic updates.",
+        "testStrategy": "1. Verify that the app.json or app.config.js contains correct production settings.\n2. Ensure that production builds are successfully created using EAS Build.\n3. Test the app on physical devices for both iOS and Android to check for any issues.\n4. Confirm that the app store listings are complete and accurate.\n5. Validate successful submission to both the Apple App Store and Google Play Store.\n6. If a continuous deployment pipeline is set up, test the pipeline for automatic updates.",
+        "status": "pending",
+        "dependencies": [
+          19,
+          27
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure Production Settings",
+            "description": "Modify app.json or app.config.js for production settings.",
+            "dependencies": [],
+            "details": "Update app name, bundle identifiers, version, icons, and splash screens in app.json or app.config.js.",
+            "status": "pending",
+            "testStrategy": "Verify correct production settings in app.json or app.config.js."
+          },
+          {
+            "id": 2,
+            "title": "Set Up EAS Build",
+            "description": "Create eas.json for cloud builds using EAS Build.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create mobile-app/eas.json to configure EAS Build for both iOS and Android platforms.",
+            "status": "pending",
+            "testStrategy": "Ensure EAS Build configuration is correct and builds are successful."
+          },
+          {
+            "id": 3,
+            "title": "Configure Environment Variables",
+            "description": "Set up production environment variables.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create mobile-app/.env.production with production API URL and other necessary variables.",
+            "status": "pending",
+            "testStrategy": "Verify that environment variables are correctly loaded in production builds."
+          },
+          {
+            "id": 4,
+            "title": "Generate App Icons and Splash Screens",
+            "description": "Create and save app icons and splash screens for both platforms.",
+            "dependencies": [
+              1
+            ],
+            "details": "Generate icons and splash screens, save as mobile-app/assets/icon.png and mobile-app/assets/splash.png.",
+            "status": "pending",
+            "testStrategy": "Check that icons and splash screens display correctly on devices."
+          },
+          {
+            "id": 5,
+            "title": "Prepare App Store Listings",
+            "description": "Create app store listings with necessary details.",
+            "dependencies": [
+              4
+            ],
+            "details": "Prepare screenshots, descriptions, and privacy policy for Apple App Store and Google Play Store.",
+            "status": "pending",
+            "testStrategy": "Ensure all required fields are completed and listings are ready for submission."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-11-07T20:01:37.664Z",
-      "updated": "2025-11-08T02:52:02.432Z",
+      "updated": "2025-11-09T09:34:01.903Z",
       "description": "Tasks for master context"
     }
   }

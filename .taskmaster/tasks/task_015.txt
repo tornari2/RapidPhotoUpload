@@ -1,0 +1,56 @@
+# Task ID: 15
+# Title: Web Upload UI
+# Status: done
+# Dependencies: 14, 8
+# Priority: medium
+# Description: Develop web UI for photo uploads with progress tracking.
+# Details:
+Implement file input for multi-select, progress bars, and SSE integration for real-time updates.
+<info added on 2025-11-07T20:44:27.925Z>
+Files to create/modify:
+
+- Create: web-app/src/components/Upload/FileUpload.tsx (file input component)
+- Create: web-app/src/components/Upload/UploadProgress.tsx (progress bar component)
+- Create: web-app/src/components/Upload/BatchProgress.tsx (batch progress indicator)
+- Create: web-app/src/hooks/useUpload.ts (upload logic hook)
+- Create: web-app/src/hooks/useSSE.ts (SSE connection hook)
+- Create: web-app/src/services/uploadService.ts (API service for uploads)
+- Create: web-app/src/services/sseService.ts (SSE client service)
+- Create: web-app/src/types/upload.ts (TypeScript types)
+- Modify: web-app/src/App.tsx (add upload UI)
+</info added on 2025-11-07T20:44:27.925Z>
+
+# Test Strategy:
+Test upload UI with SSE updates and progress tracking.
+
+# Subtasks:
+## 1. Design File Input for Multi-Select [done]
+### Dependencies: None
+### Description: Create a file input element that allows users to select multiple photos for upload.
+### Details:
+Implement an HTML file input with the 'multiple' attribute to allow multi-select. Style the input for better user experience.
+
+## 2. Implement Progress Bars for Uploads [done]
+### Dependencies: 15.1
+### Description: Develop progress bars to visually indicate the upload progress of each photo.
+### Details:
+Use JavaScript to track upload progress and update the progress bars dynamically. Ensure each file has its own progress bar.
+
+## 3. Integrate Server-Sent Events (SSE) [done]
+### Dependencies: 15.2
+### Description: Set up SSE to provide real-time updates on upload progress.
+### Details:
+Configure the server to send SSE updates and the client to listen and update the UI accordingly.
+
+## 4. Develop Error Handling for Upload Failures [done]
+### Dependencies: 15.1, 15.2
+### Description: Implement error handling for failed uploads and display appropriate messages to users.
+### Details:
+Add client-side checks and server responses to handle errors. Display error messages near the affected file input.
+
+## 5. Conduct End-to-End Testing [done]
+### Dependencies: 15.1, 15.2, 15.3, 15.4
+### Description: Perform comprehensive testing of the entire upload UI workflow.
+### Details:
+Test the complete upload process including file selection, progress tracking, SSE updates, and error handling.
+

@@ -1,0 +1,53 @@
+# Task ID: 7
+# Title: Photo Completion Handler
+# Status: done
+# Dependencies: 6
+# Priority: medium
+# Description: Implement CompletePhotoUploadCommand and handler.
+# Details:
+Handle notifications from clients about completed uploads. Verify S3 existence and update photo status to COMPLETED.
+<info added on 2025-11-07T20:43:38.039Z>
+Files to create/modify:
+
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/CompletePhotoUploadCommand.java
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/CompletePhotoUploadHandler.java
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/FailPhotoUploadCommand.java
+- Create: backend/src/main/java/com/rapidphoto/features/upload-photo/FailPhotoUploadHandler.java
+- Modify: backend/src/main/java/com/rapidphoto/features/upload-photo/UploadPhotoController.java (add completion/failure endpoints)
+- Create: backend/src/test/java/com/rapidphoto/features/upload-photo/PhotoCompletionIntegrationTest.java
+</info added on 2025-11-07T20:43:38.039Z>
+
+# Test Strategy:
+Integration test for photo completion workflow and database updates.
+
+# Subtasks:
+## 1. Design CompletePhotoUploadCommand [done]
+### Dependencies: None
+### Description: Design the CompletePhotoUploadCommand structure.
+### Details:
+Define the command attributes and validation logic.
+
+## 2. Implement S3 Existence Verification [done]
+### Dependencies: 7.1
+### Description: Develop logic to verify photo existence in S3.
+### Details:
+Use AWS SDK to check if the photo exists in the specified S3 bucket.
+
+## 3. Develop Photo Status Update Logic [done]
+### Dependencies: 7.2
+### Description: Implement logic to update photo status to COMPLETED.
+### Details:
+Update the database record for the photo to mark it as COMPLETED.
+
+## 4. Create Notification Handler [done]
+### Dependencies: 7.1
+### Description: Develop handler to process notifications from clients.
+### Details:
+Set up a listener to handle incoming notifications and trigger the command execution.
+
+## 5. Integration Testing for Completion Workflow [done]
+### Dependencies: 7.3, 7.4
+### Description: Conduct integration tests for the entire photo completion workflow.
+### Details:
+Test the end-to-end process from notification to status update.
+

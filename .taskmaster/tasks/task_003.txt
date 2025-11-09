@@ -1,0 +1,72 @@
+# Task ID: 3
+# Title: Database Schema Creation
+# Status: done
+# Dependencies: 2
+# Priority: medium
+# Description: Create database schema and migration scripts.
+# Details:
+Design tables for users, upload_jobs, photos, upload_events, and tags. Implement migration scripts using Flyway or Liquibase.
+<info added on 2025-11-07T20:43:22.787Z>
+Files to create/modify:
+
+- Create: backend/src/main/resources/db/migration/V1__Create_users_table.sql
+- Create: backend/src/main/resources/db/migration/V2__Create_upload_jobs_table.sql
+- Create: backend/src/main/resources/db/migration/V3__Create_photos_table.sql
+- Create: backend/src/main/resources/db/migration/V4__Create_upload_events_table.sql
+- Create: backend/src/main/resources/db/migration/V5__Create_tags_table.sql
+- Create: backend/src/main/resources/db/migration/V6__Create_photo_tags_table.sql
+- Modify: backend/pom.xml (add Flyway dependency)
+- Modify: backend/src/main/resources/application.properties (add Flyway configuration)
+</info added on 2025-11-07T20:43:22.787Z>
+
+# Test Strategy:
+Run migration scripts and verify table creation in PostgreSQL.
+
+# Subtasks:
+## 1. Design User Table Schema [done]
+### Dependencies: None
+### Description: Create the schema for the users table.
+### Details:
+Define columns for user ID, name, email, password hash, and timestamps.
+
+## 2. Design Upload Jobs Table Schema [done]
+### Dependencies: 3.1
+### Description: Create the schema for the upload_jobs table.
+### Details:
+Define columns for job ID, user ID, status, and timestamps.
+
+## 3. Design Photos Table Schema [done]
+### Dependencies: 3.1, 3.2
+### Description: Create the schema for the photos table.
+### Details:
+Define columns for photo ID, job ID, URL, status, and timestamps.
+
+## 4. Design Upload Events and Tags Table Schemas [done]
+### Dependencies: 3.1, 3.2, 3.3
+### Description: Create schemas for upload_events and tags tables.
+### Details:
+Define columns for event ID, photo ID, event type, and tag ID, tag name.
+
+## 5. Implement Migration Scripts [done]
+### Dependencies: 3.1, 3.2, 3.3, 3.4
+### Description: Develop migration scripts using Flyway or Liquibase.
+### Details:
+Write scripts to create all tables and manage schema versions.
+<info added on 2025-11-07T21:14:48.092Z>
+✅ Completed: Created all 6 Flyway migration scripts:
+- V1: users table with username uniqueness and index
+- V2: upload_jobs table with status constraints, count validations, and indexes
+- V3: photos table with status constraints, file size validation, and indexes
+- V4: upload_events table with JSONB metadata support and GIN index
+- V5: tags table with name uniqueness and validation
+- V6: photo_tags junction table with composite primary key and indexes
+
+All migrations include:
+- Proper foreign key relationships with CASCADE/SET NULL as appropriate
+- Check constraints for data integrity
+- Indexes for performance optimization
+- Alignment with domain entities created in Task 2
+
+Flyway dependencies already present in pom.xml, configuration already in application.properties.
+</info added on 2025-11-07T21:14:48.092Z>
+

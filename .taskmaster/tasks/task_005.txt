@@ -1,0 +1,53 @@
+# Task ID: 5
+# Title: Async Configuration
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Configure Spring @Async for concurrent upload handling.
+# Details:
+Set up AsyncConfig with a fixed thread pool of 100 threads. Ensure proper handling of concurrent uploads.
+<info added on 2025-11-07T20:43:29.479Z>
+Files to create/modify:
+
+- Create: `backend/src/main/java/com/rapidphoto/infrastructure/config/AsyncConfig.java` for thread pool configuration.
+- Modify: `backend/src/main/resources/application.properties` to add async thread pool settings.
+- Create: `backend/src/test/java/com/rapidphoto/infrastructure/config/AsyncConfigTest.java` for unit tests.
+</info added on 2025-11-07T20:43:29.479Z>
+
+# Test Strategy:
+Load test with concurrent upload operations to verify thread pool configuration.
+
+# Subtasks:
+## 1. Create AsyncConfig Class [done]
+### Dependencies: None
+### Description: Develop the AsyncConfig class to manage asynchronous operations.
+### Details:
+Create a new class named AsyncConfig in the configuration package.
+
+## 2. Configure Thread Pool Executor [done]
+### Dependencies: 5.1
+### Description: Set up a thread pool executor with a fixed size of 100 threads.
+### Details:
+In AsyncConfig, configure a ThreadPoolTaskExecutor with a core pool size of 100.
+
+## 3. Enable Async Support [done]
+### Dependencies: 5.1
+### Description: Enable asynchronous method execution in the application.
+### Details:
+Annotate the AsyncConfig class with @EnableAsync to enable async support.
+
+## 4. Annotate Methods with @Async [done]
+### Dependencies: 5.3
+### Description: Identify and annotate methods that require asynchronous execution.
+### Details:
+Annotate relevant service methods with @Async to handle concurrent uploads.
+<info added on 2025-11-07T22:29:23.560Z>
+No controllers or service methods requiring @Async annotation exist yet. The AsyncConfig is ready, and when upload processing methods are created in controllers/services, they should be annotated with @Async to leverage the configured thread pool. The S3Service methods (generateUploadUrl, etc.) are synchronous and fast (just URL generation), so they don't need async execution.
+</info added on 2025-11-07T22:29:23.560Z>
+
+## 5. Load Test Async Configuration [done]
+### Dependencies: 5.2, 5.4
+### Description: Perform load testing to verify the async configuration handles concurrent uploads.
+### Details:
+Conduct load testing using a tool like JMeter to simulate concurrent uploads and validate performance.
+
