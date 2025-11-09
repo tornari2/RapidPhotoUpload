@@ -50,7 +50,6 @@ export default function GalleryPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
-  const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
 
   // Combine loaded photos with uploading photos and apply tag updates
   const allPhotos = useMemo(() => {
@@ -71,21 +70,11 @@ export default function GalleryPage() {
     });
   }, [loadedPhotos, uploadingPhotos, photoTagUpdates]);
 
-  // Track when initial load is complete
-  useEffect(() => {
+  // Calculate how many photos are currently loading
+  const photosCurrentlyLoading = useMemo(() => {
     const nonUploadingPhotos = allPhotos.filter(p => p.uploadStatus !== 'UPLOADING');
-    if (!isLoading && !isLoadingMore && nonUploadingPhotos.length > 0 && loadedCount >= nonUploadingPhotos.length) {
-      setIsInitialLoadComplete(true);
-    }
-  }, [isLoading, isLoadingMore, allPhotos, loadedCount]);
-
-  // Reset initial load flag when user changes or photos list is reset
-  useEffect(() => {
-    if (loadedPhotos.length === 0) {
-      setIsInitialLoadComplete(false);
-      setLoadedCount(0);
-    }
-  }, [loadedPhotos.length]);
+    return Math.max(0, nonUploadingPhotos.length - loadedCount);
+  }, [allPhotos, loadedCount]);
 
   // Sync loadedCount when allPhotos changes (handles deletions/additions)
   useEffect(() => {
@@ -491,11 +480,6 @@ export default function GalleryPage() {
               {totalElements > 0 && (
                 <span>
                   {totalElements} photo{totalElements !== 1 ? 's' : ''}
-                  {uploadingPhotos.size > 0 && (
-                    <span className="ml-2 text-blue-400">
-                      ({uploadingPhotos.size} uploading)
-                    </span>
-                  )}
                 </span>
               )}
             </p>
@@ -564,8 +548,8 @@ export default function GalleryPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto max-w-7xl w-full mx-auto px-6 lg:px-8 pt-6 pb-6">
-        {/* Global loading progress bar - only show during actual initial loading, not after deletions */}
-        {!showLoadingScreen && !isDeleting && !isInitialLoadComplete && allPhotos.length > 0 && loadedCount < allPhotos.filter(p => p.uploadStatus !== 'UPLOADING').length && (
+        {/* Global loading progress bar - only show when 2+ photos are loading simultaneously */}
+        {!showLoadingScreen && !isDeleting && photosCurrentlyLoading >= 2 && (
           <div className="mb-6 px-8">
             <div className="w-full max-w-2xl mx-auto">
               <ProgressBar 
@@ -591,6 +575,7 @@ export default function GalleryPage() {
           onToggleSelection={handleToggleSelection}
           onLoadedCountChange={setLoadedCount}
           downloadProgress={downloadProgress}
+          uploadProgress={uploadProgress}
         />
       </div>
 

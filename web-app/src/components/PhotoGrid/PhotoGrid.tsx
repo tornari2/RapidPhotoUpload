@@ -3,6 +3,7 @@ import { PhotoThumbnail } from './PhotoThumbnail';
 import { ProgressBar } from '../Common/ProgressBar';
 import type { Photo } from '../../types/photo';
 import type { DownloadProgress } from '../../services/downloadService';
+import type { BatchUploadProgress } from '../../types/upload';
 import { photoService } from '../../services/photoService';
 
 interface PhotoGridProps {
@@ -18,6 +19,7 @@ interface PhotoGridProps {
   onToggleSelection?: (photoId: string) => void;
   onLoadedCountChange?: (count: number) => void;
   downloadProgress?: Map<string, DownloadProgress>;
+  uploadProgress?: BatchUploadProgress | null;
 }
 
 /**
@@ -36,6 +38,7 @@ export function PhotoGrid({
   onToggleSelection,
   onLoadedCountChange,
   downloadProgress,
+  uploadProgress,
 }: PhotoGridProps) {
   const observerTarget = useRef<HTMLDivElement>(null);
   const [thumbnailUrls, setThumbnailUrls] = useState<Map<string, string>>(new Map());
@@ -199,19 +202,25 @@ export function PhotoGrid({
     <div className="w-full">
       {/* CSS Grid Layout */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {photos.map((photo) => (
-          <PhotoThumbnail
-            key={photo.id}
-            photo={photo}
-            onClick={onPhotoClick}
-            getThumbnailUrl={getThumbnailUrl}
-            onDelete={onDelete}
-            onTag={onTag}
-            isSelected={selectedPhotos?.has(photo.id)}
-            onLoad={handlePhotoLoad}
-            downloadProgress={downloadProgress?.get(photo.id)}
-          />
-        ))}
+        {photos.map((photo) => {
+          // Find upload progress for this specific photo
+          const photoUploadProgress = uploadProgress?.photos.find(p => p.photoId === photo.id);
+          
+          return (
+            <PhotoThumbnail
+              key={photo.id}
+              photo={photo}
+              onClick={onPhotoClick}
+              getThumbnailUrl={getThumbnailUrl}
+              onDelete={onDelete}
+              onTag={onTag}
+              isSelected={selectedPhotos?.has(photo.id)}
+              onLoad={handlePhotoLoad}
+              downloadProgress={downloadProgress?.get(photo.id)}
+              uploadProgress={photoUploadProgress}
+            />
+          );
+        })}
       </div>
 
       {/* Infinite scroll trigger */}

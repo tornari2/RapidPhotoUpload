@@ -139,8 +139,17 @@ export function useUpload() {
               return updated;
             });
 
-            // Upload to S3
-            await uploadService.uploadToS3(uploadUrl, file.file);
+            // Upload to S3 with progress tracking
+            await uploadService.uploadToS3(uploadUrl, file.file, (progress) => {
+              setUploadProgress((prev) => {
+                if (!prev) return prev;
+                const updated = { ...prev };
+                updated.photos = prev.photos.map((p) =>
+                  p.photoId === photoId ? { ...p, progress } : p
+                );
+                return updated;
+              });
+            });
 
             // Notify backend of completion
             await uploadService.completePhotoUpload(photoId);

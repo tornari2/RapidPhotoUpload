@@ -4,6 +4,7 @@ import { DownloadButton } from '../Download/DownloadButton';
 import { ProgressBar } from '../Common/ProgressBar';
 import type { Photo } from '../../types/photo';
 import type { DownloadProgress } from '../../services/downloadService';
+import type { UploadProgress } from '../../types/upload';
 
 interface PhotoThumbnailProps {
   photo: Photo;
@@ -14,6 +15,7 @@ interface PhotoThumbnailProps {
   isSelected?: boolean;
   onLoad?: (photoId: string) => void;
   downloadProgress?: DownloadProgress;
+  uploadProgress?: UploadProgress;
 }
 
 /**
@@ -29,10 +31,12 @@ export function PhotoThumbnail({
   isSelected = false,
   onLoad,
   downloadProgress,
+  uploadProgress,
 }: PhotoThumbnailProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false); // Track when image is actually loaded
   const photoIdRef = useRef<string>(photo.id);
   const isMountedRef = useRef(true);
   const retryCountRef = useRef<number>(0);
@@ -48,7 +52,11 @@ export function PhotoThumbnail({
   useEffect(() => {
     if (photo.uploadStatus === 'UPLOADING') {
       setIsLoading(false);
-      setImageUrl(null); // Clear any existing image URL
+      setImageLoaded(false); // Reset image loaded state
+      // Don't clear imageUrl if we already have one - this prevents flashing
+      if (!imageUrl) {
+        setImageUrl(null);
+      }
       return;
     }
 
@@ -58,6 +66,7 @@ export function PhotoThumbnail({
       setImageUrl(null);
       setIsLoading(true);
       setError(false);
+      setImageLoaded(false);
       retryCountRef.current = 0;
       photoIdRef.current = currentPhotoId;
     }
@@ -110,7 +119,7 @@ export function PhotoThumbnail({
       isCancelled = true;
       isMountedRef.current = false;
     };
-  }, [photo.id, photo.uploadStatus, getThumbnailUrl, imageUrl, error]); // Added photo.uploadStatus and dependencies
+  }, [photo.id, photo.uploadStatus, getThumbnailUrl]); // Removed imageUrl and error from deps to prevent re-renders
 
   const handleClick = () => {
     // Don't allow clicking on photos that are still uploading
@@ -155,11 +164,21 @@ export function PhotoThumbnail({
         </div>
       )}
 
-      {/* Hide uploading progress bar */}
-      {photo.uploadStatus === 'UPLOADING' && !downloadProgress && (
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10 p-4">
+      {/* Upload progress overlay with progress bar - stays visible until image loads */}
+      {(photo.uploadStatus === 'UPLOADING' || (photo.uploadStatus === 'COMPLETED' && !imageLoaded)) && !downloadProgress && (
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-10 p-4">
           <div className="flex flex-col items-center gap-2 w-full">
-            <span className="text-white text-xs font-medium">Uploading...</span>
+            <ProgressBar 
+              size="sm" 
+              color="blue" 
+              className="w-full" 
+              progress={uploadProgress?.progress || (photo.uploadStatus === 'COMPLETED' ? 100 : undefined)}
+            />
+            {(uploadProgress?.progress !== undefined || photo.uploadStatus === 'COMPLETED') && (
+              <span className="text-white text-xs font-medium">
+                {photo.uploadStatus === 'COMPLETED' ? '100' : Math.round(uploadProgress?.progress || 0)}%
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -202,6 +221,7 @@ export function PhotoThumbnail({
             }
           }}
           onLoad={() => {
+            setImageLoaded(true); // Mark image as loaded
             if (onLoad && photo.uploadStatus !== 'UPLOADING') {
               onLoad(photo.id);
             }
