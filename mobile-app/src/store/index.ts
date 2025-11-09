@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-// Import your reducers here when you create them
-// import photosReducer from './slices/photosSlice';
-// import uploadReducer from './slices/uploadSlice';
-// import tagsReducer from './slices/tagsSlice';
+// Placeholder reducer until we add feature slices
+const placeholderReducer = (state = {}) => state;
 
 export const store = configureStore({
   reducer: {
-    // Add your reducers here
+    // Placeholder reducer - will be replaced with actual reducers in future tasks
+    app: placeholderReducer,
+    // Add your reducers here when you create them:
     // photos: photosReducer,
     // upload: uploadReducer,
     // tags: tagsReducer,
@@ -28,4 +28,3 @@ export const store = configureStore({
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
