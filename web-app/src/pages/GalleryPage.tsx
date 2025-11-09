@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePhotos } from '../hooks/usePhotos';
 import { useUpload } from '../hooks/useUpload';
+import { useDownload } from '../hooks/useDownload';
 import { PhotoGrid } from '../components/PhotoGrid/PhotoGrid';
 import { BulkTagModal } from '../components/Tagging/BulkTagModal';
 import { BulkDownload } from '../components/Download/BulkDownload';
 import { TagInput } from '../components/Tagging/TagInput';
+import { ProgressBar } from '../components/Common/ProgressBar';
 import { useTags } from '../hooks/useTags';
 import { photoService } from '../services/photoService';
 import { HeaderUploadButton } from '../components/Upload/HeaderUploadButton';
@@ -43,18 +45,70 @@ export default function GalleryPage() {
   });
 
   const { uploadPhotos, uploadProgress } = useUpload();
+  const { photoProgress: downloadProgress } = useDownload();
   const { tagPhoto, isLoading: isTagging } = useTags();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
+  const [loadedCount, setLoadedCount] = useState(0);
+  const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
 
   // Combine loaded photos with uploading photos and apply tag updates
   const allPhotos = useMemo(() => {
-    const combined = [...Array.from(uploadingPhotos.values()), ...loadedPhotos];
+    // Create a Set of loaded photo IDs to prevent duplicates
+    const loadedPhotoIds = new Set(loadedPhotos.map(p => p.id));
+    
+    // Only include uploading photos that aren't already in loadedPhotos
+    const uploadingPhotosArray = Array.from(uploadingPhotos.values()).filter(
+      photo => !loadedPhotoIds.has(photo.id)
+    );
+    
+    const combined = [...uploadingPhotosArray, ...loadedPhotos];
+    
     // Apply tag updates to photos
     return combined.map((photo) => {
       const updated = photoTagUpdates.get(photo.id);
       return updated || photo;
     });
   }, [loadedPhotos, uploadingPhotos, photoTagUpdates]);
+
+  // Track when initial load is complete
+  useEffect(() => {
+    const nonUploadingPhotos = allPhotos.filter(p => p.uploadStatus !== 'UPLOADING');
+    if (!isLoading && !isLoadingMore && nonUploadingPhotos.length > 0 && loadedCount >= nonUploadingPhotos.length) {
+      setIsInitialLoadComplete(true);
+    }
+  }, [isLoading, isLoadingMore, allPhotos, loadedCount]);
+
+  // Reset initial load flag when user changes or photos list is reset
+  useEffect(() => {
+    if (loadedPhotos.length === 0) {
+      setIsInitialLoadComplete(false);
+      setLoadedCount(0);
+    }
+  }, [loadedPhotos.length]);
+
+  // Sync loadedCount when allPhotos changes (handles deletions/additions)
+  useEffect(() => {
+    const nonUploadingPhotos = allPhotos.filter(p => p.uploadStatus !== 'UPLOADING');
+    // If we have fewer photos than loaded count, adjust it down (photo was deleted)
+    if (nonUploadingPhotos.length < loadedCount) {
+      setLoadedCount(nonUploadingPhotos.length);
+    }
+  }, [allPhotos, loadedCount]);
+
+  // Delay showing loading screen to prevent flicker on fast refreshes
+  useEffect(() => {
+    if (isLoading && allPhotos.length === 0) {
+      // Only show loading screen after 150ms delay
+      const timer = setTimeout(() => {
+        setShowLoadingScreen(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else {
+      // Hide loading screen immediately when we have photos or loading completes
+      setShowLoadingScreen(false);
+    }
+  }, [isLoading, allPhotos.length]);
 
   // Prevent body scroll - only the photo grid should scroll
   useEffect(() => {
@@ -226,6 +280,13 @@ export default function GalleryPage() {
       
       // Also refresh to ensure consistency (though tags won't be in the response)
       await refresh();
+      
+      // Deselect the tagged photo
+      setSelectedPhotos((prev) => {
+        const updated = new Set(prev);
+        updated.delete(taggingPhoto.id);
+        return updated;
+      });
       
       setShowTagModal(false);
       setTaggingPhoto(null);
@@ -419,7 +480,10 @@ export default function GalleryPage() {
 
   return (
     <div className="h-[calc(100vh-4rem)] bg-black flex flex-col overflow-hidden">
-      <div className="flex-shrink-0 max-w-7xl w-full mx-auto px-6 lg:px-8 pt-6 pb-4">
+      <div
+        className="flex-shrink-0 max-w-7xl w-full mx-auto px-6 lg:px-8 pt-6 pb-4 relative z-[80]"
+        id="gallery-header"
+      >
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">My Photos</h1>
@@ -437,7 +501,7 @@ export default function GalleryPage() {
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" id="gallery-header-actions">
             {selectedPhotos.size > 0 && (
               <>
                 <span className="text-sm text-white">
@@ -445,7 +509,10 @@ export default function GalleryPage() {
                 </span>
                 <BulkDownload
                   photos={selectedPhotosList}
-                  onComplete={() => {}}
+                  onComplete={() => {
+                    // Clear selections after download completes
+                    setSelectedPhotos(new Set());
+                  }}
                 />
                 <button
                   onClick={() => setShowBulkTagModal(true)}
@@ -471,28 +538,22 @@ export default function GalleryPage() {
           </div>
         </div>
 
-        {allPhotos.length > 0 && (
-          <div className="mb-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 items-end">
-              <div className="col-span-1">
-                <button
-                  onClick={handleSelectAll}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-800 bg-gradient-to-br from-gray-300 via-gray-200 to-gray-400 border border-gray-500 rounded-md hover:from-gray-400 hover:via-gray-300 hover:to-gray-500 shadow-md hover:shadow-lg transition-all"
-                >
-                  {(() => {
-                    const selectablePhotos = allPhotos.filter((p) => p.uploadStatus !== 'UPLOADING');
-                    return selectedPhotos.size === selectablePhotos.length && selectablePhotos.length > 0
-                      ? 'Deselect All'
-                      : 'Select All';
-                  })()}
-                </button>
-              </div>
-              <div className="col-start-2 sm:col-start-3 md:col-start-4 lg:col-start-5 xl:col-start-6 col-end-[-1] flex justify-end">
-                <HeaderUploadButton />
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="mb-4 flex items-end justify-between" id="gallery-select-row">
+          {allPhotos.length > 0 && (
+            <button
+              onClick={handleSelectAll}
+              className="px-3 py-1.5 text-xs font-medium text-gray-800 bg-gradient-to-br from-gray-300 via-gray-200 to-gray-400 border border-gray-500 rounded-md hover:from-gray-400 hover:via-gray-300 hover:to-gray-500 shadow-md hover:shadow-lg transition-all"
+            >
+              {(() => {
+                const selectablePhotos = allPhotos.filter((p) => p.uploadStatus !== 'UPLOADING');
+                return selectedPhotos.size === selectablePhotos.length && selectablePhotos.length > 0
+                  ? 'Deselect All'
+                  : 'Select All';
+              })()}
+            </button>
+          )}
+          <HeaderUploadButton />
+        </div>
 
         {error && (
           <div className="mb-4 bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
@@ -503,9 +564,23 @@ export default function GalleryPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto max-w-7xl w-full mx-auto px-6 lg:px-8 pt-6 pb-6">
+        {/* Global loading progress bar - only show during actual initial loading, not after deletions */}
+        {!showLoadingScreen && !isDeleting && !isInitialLoadComplete && allPhotos.length > 0 && loadedCount < allPhotos.filter(p => p.uploadStatus !== 'UPLOADING').length && (
+          <div className="mb-6 px-8">
+            <div className="w-full max-w-2xl mx-auto">
+              <ProgressBar 
+                size="md" 
+                color="blue" 
+                showLabel 
+                label={`Loading photos: ${loadedCount} of ${allPhotos.filter(p => p.uploadStatus !== 'UPLOADING').length}`}
+              />
+            </div>
+          </div>
+        )}
+        
         <PhotoGrid
           photos={allPhotos}
-          isLoading={isLoading && allPhotos.length === 0}
+          isLoading={showLoadingScreen}
           isLoadingMore={isLoadingMore}
           hasNextPage={hasNextPage}
           onLoadMore={loadMore}
@@ -514,6 +589,8 @@ export default function GalleryPage() {
           onTag={handleOpenTagModal}
           selectedPhotos={selectedPhotos}
           onToggleSelection={handleToggleSelection}
+          onLoadedCountChange={setLoadedCount}
+          downloadProgress={downloadProgress}
         />
       </div>
 

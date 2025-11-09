@@ -1,6 +1,8 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { PhotoThumbnail } from './PhotoThumbnail';
+import { ProgressBar } from '../Common/ProgressBar';
 import type { Photo } from '../../types/photo';
+import type { DownloadProgress } from '../../services/downloadService';
 import { photoService } from '../../services/photoService';
 
 interface PhotoGridProps {
@@ -15,6 +17,7 @@ interface PhotoGridProps {
   selectedPhotos?: Set<string>;
   onToggleSelection?: (photoId: string) => void;
   onLoadedCountChange?: (count: number) => void;
+  downloadProgress?: Map<string, DownloadProgress>;
 }
 
 /**
@@ -32,6 +35,7 @@ export function PhotoGrid({
   selectedPhotos,
   onToggleSelection,
   onLoadedCountChange,
+  downloadProgress,
 }: PhotoGridProps) {
   const observerTarget = useRef<HTMLDivElement>(null);
   const [thumbnailUrls, setThumbnailUrls] = useState<Map<string, string>>(new Map());
@@ -78,41 +82,41 @@ export function PhotoGrid({
 
       if (photosToPrefetch.length === 0) return;
 
-      // Prefetch in batches of 20 to avoid overwhelming the server
-      const batchSize = 20;
+      // Prefetch in batches of 50 for better performance
+      const batchSize = 50;
       for (let i = 0; i < photosToPrefetch.length; i += batchSize) {
         const batch = photosToPrefetch.slice(i, i + batchSize);
         
         // Fetch all URLs in parallel for this batch
         const promises = batch.map(async (photo) => {
           try {
-            const response = await photoService.getDownloadUrl(photo.id, photo.userId, 60);
+            const response = await photoService.getDownloadUrl(photo.id, photo.userId, 3600); // 60 hour expiration
             const url = response.downloadUrl;
             
-            // Cache the URL
+            // Cache the URL first
             setThumbnailUrls((prev) => {
               const updated = new Map(prev);
               updated.set(photo.id, url);
               return updated;
             });
             
-            // Preload the image in the browser
-            const img = new Image();
-            img.src = url;
-            
-            return url;
+            // Preload the image in the browser with proper cache headers
+            return new Promise<void>((resolve, reject) => {
+              const img = new Image();
+              img.onload = () => resolve();
+              img.onerror = () => reject(new Error(`Failed to preload ${photo.id}`));
+              img.src = url;
+            });
           } catch (error) {
             console.error(`Failed to prefetch thumbnail URL for ${photo.id}:`, error);
             return null;
           }
         });
         
-        await Promise.all(promises);
+        // Wait for all images in batch to preload before moving to next batch
+        await Promise.allSettled(promises);
         
-        // Small delay between batches to avoid overwhelming
-        if (i + batchSize < photosToPrefetch.length) {
-          await new Promise(resolve => setTimeout(resolve, 50));
-        }
+        // No delay between batches - browser will handle rate limiting
       }
     };
 
@@ -129,7 +133,7 @@ export function PhotoGrid({
 
       // Fetch download URL (should rarely happen due to prefetching)
       try {
-        const response = await photoService.getDownloadUrl(photo.id, photo.userId, 60);
+        const response = await photoService.getDownloadUrl(photo.id, photo.userId, 3600); // 60 hour expiration
         const url = response.downloadUrl;
         
         // Cache the URL persistently (don't clear on photos array changes)
@@ -174,8 +178,10 @@ export function PhotoGrid({
 
   if (isLoading && photos.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-[400px] px-8">
+        <div className="w-full max-w-md">
+          <ProgressBar size="lg" color="blue" showLabel label="Loading photos..." />
+        </div>
       </div>
     );
   }
@@ -203,15 +209,18 @@ export function PhotoGrid({
             onTag={onTag}
             isSelected={selectedPhotos?.has(photo.id)}
             onLoad={handlePhotoLoad}
+            downloadProgress={downloadProgress?.get(photo.id)}
           />
         ))}
       </div>
 
       {/* Infinite scroll trigger */}
       {hasNextPage && (
-        <div ref={observerTarget} className="h-20 flex items-center justify-center">
+        <div ref={observerTarget} className="h-20 flex items-center justify-center px-8">
           {isLoadingMore && (
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-full max-w-md">
+              <ProgressBar size="md" color="blue" showLabel label="Loading more photos..." />
+            </div>
           )}
         </div>
       )}

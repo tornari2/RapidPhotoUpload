@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { TagDisplay } from '../Tagging/TagDisplay';
 import { DownloadButton } from '../Download/DownloadButton';
+import { ProgressBar } from '../Common/ProgressBar';
 import type { Photo } from '../../types/photo';
+import type { DownloadProgress } from '../../services/downloadService';
 
 interface PhotoThumbnailProps {
   photo: Photo;
@@ -11,6 +13,7 @@ interface PhotoThumbnailProps {
   onTag?: (photo: Photo) => void;
   isSelected?: boolean;
   onLoad?: (photoId: string) => void;
+  downloadProgress?: DownloadProgress;
 }
 
 /**
@@ -25,6 +28,7 @@ export function PhotoThumbnail({
   onTag,
   isSelected = false,
   onLoad,
+  downloadProgress,
 }: PhotoThumbnailProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,6 +48,7 @@ export function PhotoThumbnail({
   useEffect(() => {
     if (photo.uploadStatus === 'UPLOADING') {
       setIsLoading(false);
+      setImageUrl(null); // Clear any existing image URL
       return;
     }
 
@@ -105,7 +110,7 @@ export function PhotoThumbnail({
       isCancelled = true;
       isMountedRef.current = false;
     };
-  }, [photo.id, getThumbnailUrl]); // getThumbnailUrl is stable, only reload when photo.id changes
+  }, [photo.id, photo.uploadStatus, getThumbnailUrl, imageUrl, error]); // Added photo.uploadStatus and dependencies
 
   const handleClick = () => {
     // Don't allow clicking on photos that are still uploading
@@ -132,7 +137,7 @@ export function PhotoThumbnail({
   return (
     <div
       className={`relative aspect-square bg-gray-200 rounded-lg overflow-hidden transition-opacity group ${
-        photo.uploadStatus === 'UPLOADING' 
+        photo.uploadStatus === 'UPLOADING' || downloadProgress?.status === 'downloading'
           ? 'cursor-not-allowed opacity-75' 
           : 'cursor-pointer hover:opacity-90'
       } ${
@@ -140,19 +145,28 @@ export function PhotoThumbnail({
       }`}
       onClick={handleClick}
     >
-      {/* Uploading overlay with spinner */}
-      {photo.uploadStatus === 'UPLOADING' && (
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+      {/* Download overlay with progress bar */}
+      {downloadProgress?.status === 'downloading' && (
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10 p-4">
+          <div className="flex flex-col items-center gap-2 w-full">
+            <ProgressBar size="md" color="blue" className="w-full" />
+            <span className="text-white text-xs font-medium">Downloading...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Hide uploading progress bar */}
+      {photo.uploadStatus === 'UPLOADING' && !downloadProgress && (
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10 p-4">
+          <div className="flex flex-col items-center gap-2 w-full">
             <span className="text-white text-xs font-medium">Uploading...</span>
           </div>
         </div>
       )}
 
       {isLoading && photo.uploadStatus !== 'UPLOADING' && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 p-4">
+          <ProgressBar size="sm" color="blue" className="w-full max-w-[60%]" />
         </div>
       )}
 
@@ -167,6 +181,7 @@ export function PhotoThumbnail({
           src={imageUrl}
           alt={photo.filename}
           className="w-full h-full object-cover"
+          loading="eager"
           onError={() => {
             // Retry image load with exponential backoff
             if (retryCountRef.current < maxRetries) {
@@ -196,8 +211,8 @@ export function PhotoThumbnail({
         />
       )}
 
-      {/* Overlay on hover - hidden when uploading */}
-      {photo.uploadStatus !== 'UPLOADING' && (
+      {/* Overlay on hover - hidden when uploading or downloading */}
+      {photo.uploadStatus !== 'UPLOADING' && downloadProgress?.status !== 'downloading' && (
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity" />
       )}
 
@@ -205,6 +220,18 @@ export function PhotoThumbnail({
       {photo.uploadStatus === 'FAILED' && (
         <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded z-20">
           Failed
+        </div>
+      )}
+      
+      {/* Download status indicator */}
+      {downloadProgress?.status === 'failed' && (
+        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded z-20">
+          Download Failed
+        </div>
+      )}
+      {downloadProgress?.status === 'completed' && (
+        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded z-20">
+          Downloaded
         </div>
       )}
 
@@ -216,7 +243,7 @@ export function PhotoThumbnail({
       )}
 
       {/* Action buttons - Tag, Download, Delete - visible on hover */}
-      {photo.uploadStatus !== 'UPLOADING' && (
+      {photo.uploadStatus !== 'UPLOADING' && downloadProgress?.status !== 'downloading' && (
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5 z-20">
           {onTag && (
             <button
