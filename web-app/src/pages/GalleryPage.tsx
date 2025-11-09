@@ -71,9 +71,11 @@ export default function GalleryPage() {
   }, [loadedPhotos, uploadingPhotos, photoTagUpdates]);
 
   // Calculate how many photos are currently loading
+  // Use min to prevent negative or inflated values during deletion/addition transitions
   const photosCurrentlyLoading = useMemo(() => {
     const nonUploadingPhotos = allPhotos.filter(p => p.uploadStatus !== 'UPLOADING');
-    return Math.max(0, nonUploadingPhotos.length - loadedCount);
+    const effectiveLoadedCount = Math.min(loadedCount, nonUploadingPhotos.length);
+    return Math.max(0, nonUploadingPhotos.length - effectiveLoadedCount);
   }, [allPhotos, loadedCount]);
 
   // Sync loadedCount when allPhotos changes (handles deletions/additions)
@@ -297,8 +299,59 @@ export default function GalleryPage() {
     setShowTagModal(true);
   };
 
-  const handleBulkTagSuccess = () => {
-    refresh();
+  const handleBulkTagSuccess = async () => {
+    if (!user) return;
+    
+    // Fetch updated photos with tags from the backend
+    const selectedPhotoIds = Array.from(selectedPhotos);
+    
+    try {
+      // Fetch each tagged photo's metadata to get the updated tags
+      const updatedPhotosPromises = selectedPhotoIds.map(photoId =>
+        photoService.getPhotoMetadata(photoId, user.id, true, true)
+      );
+      
+      const updatedPhotosMetadata = await Promise.all(updatedPhotosPromises);
+      
+      // Update the photo tag updates map with the new tag data
+      setPhotoTagUpdates((prev) => {
+        const updated = new Map(prev);
+        
+        updatedPhotosMetadata.forEach((metadata) => {
+          // Convert PhotoMetadataResponse to Photo format
+          const photoWithTags: Photo = {
+            id: metadata.id,
+            userId: metadata.userId,
+            uploadJobId: metadata.uploadJobId,
+            filename: metadata.filename,
+            s3Key: metadata.s3Key,
+            fileSize: metadata.fileSize,
+            contentType: metadata.contentType,
+            uploadStatus: metadata.uploadStatus,
+            retryCount: metadata.retryCount,
+            createdAt: metadata.createdAt,
+            completedAt: metadata.completedAt,
+            // Convert tags from string[] to Tag[] format
+            tags: metadata.tags?.map((tagName, index) => ({
+              id: `${metadata.id}-tag-${index}`, // Temporary ID
+              name: tagName,
+            })) || [],
+          };
+          
+          updated.set(metadata.id, photoWithTags);
+        });
+        
+        return updated;
+      });
+      
+      // Also refresh to ensure full consistency
+      refresh();
+    } catch (err) {
+      console.error('Failed to fetch updated tags:', err);
+      // Fallback to just refreshing
+      refresh();
+    }
+    
     setSelectedPhotos(new Set());
   };
 
@@ -341,9 +394,17 @@ export default function GalleryPage() {
     }
     
     setIsDeleting(true);
+    
+    // Optimistically remove the photo from local state immediately
+    const previousPhotos = loadedPhotos;
+    const previousUploadingPhotos = uploadingPhotos;
+    const previousSelectedPhotos = selectedPhotos;
+    
+    // Remove from loaded photos optimistically
+    setLoadedCount(prev => Math.max(0, prev - 1));
+    
     try {
       await photoService.deletePhoto(photo.id, user.id);
-      await refresh();
       
       // Remove from uploading photos if present
       setUploadingPhotos((prev) => {
@@ -358,6 +419,16 @@ export default function GalleryPage() {
         updated.delete(photo.id);
         return updated;
       });
+      
+      // Remove from tag updates
+      setPhotoTagUpdates((prev) => {
+        const updated = new Map(prev);
+        updated.delete(photo.id);
+        return updated;
+      });
+      
+      // Silently refresh in background to ensure consistency
+      refresh();
     } catch (err: any) {
       console.error('Failed to delete photo:', err);
       
@@ -383,12 +454,18 @@ export default function GalleryPage() {
           return updated;
         });
       } else {
-        // For other errors (access denied, etc.), show an alert
+        // For other errors (access denied, etc.), show an alert and restore state
         const displayMessage = errorMessage || 'Failed to delete photo. Please try again.';
         alert(`Failed to delete photo: ${displayMessage}`);
+        
+        // Restore previous state on error
+        setLoadedCount(previousPhotos.length);
       }
     } finally {
-      setIsDeleting(false);
+      // Small delay before clearing isDeleting to prevent progress bar flicker
+      setTimeout(() => {
+        setIsDeleting(false);
+      }, 100);
     }
   };
 
@@ -452,7 +529,10 @@ export default function GalleryPage() {
       await refresh();
       setSelectedPhotos(new Set());
     } finally {
-      setIsDeleting(false);
+      // Small delay before clearing isDeleting to prevent progress bar flicker
+      setTimeout(() => {
+        setIsDeleting(false);
+      }, 100);
     }
   };
 
@@ -486,6 +566,7 @@ export default function GalleryPage() {
           </div>
           
           <div className="flex items-center gap-3" id="gallery-header-actions">
+            <HeaderUploadButton />
             {selectedPhotos.size > 0 && (
               <>
                 <span className="text-sm text-white">
@@ -522,8 +603,8 @@ export default function GalleryPage() {
           </div>
         </div>
 
-        <div className="mb-4 flex items-end justify-between" id="gallery-select-row">
-          {allPhotos.length > 0 && (
+        {allPhotos.length > 0 && (
+          <div className="mb-4" id="gallery-select-row">
             <button
               onClick={handleSelectAll}
               className="px-3 py-1.5 text-xs font-medium text-gray-800 bg-gradient-to-br from-gray-300 via-gray-200 to-gray-400 border border-gray-500 rounded-md hover:from-gray-400 hover:via-gray-300 hover:to-gray-500 shadow-md hover:shadow-lg transition-all"
@@ -535,9 +616,8 @@ export default function GalleryPage() {
                   : 'Select All';
               })()}
             </button>
-          )}
-          <HeaderUploadButton />
-        </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
