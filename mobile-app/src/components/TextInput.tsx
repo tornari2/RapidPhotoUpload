@@ -9,32 +9,36 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface CustomTextInputProps extends TextInputProps {
+interface CustomTextInputProps extends Omit<TextInputProps, 'editable'> {
   label?: string;
   error?: string;
   secureTextEntry?: boolean;
+  editable?: boolean;
 }
 
 export const TextInput: React.FC<CustomTextInputProps> = ({
   label,
   error,
   secureTextEntry = false,
+  editable = true,
   style,
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isSecure = Boolean(secureTextEntry);
+  const isEditable = Boolean(editable);
 
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={[styles.inputContainer, error && styles.inputError]}>
         <RNTextInput
+          {...props}
           style={[styles.input, style]}
           placeholderTextColor="#6B7280"
           secureTextEntry={isSecure && !isPasswordVisible}
           autoCapitalize="none"
-          {...props}
+          editable={isEditable}
         />
         {isSecure && (
           <TouchableOpacity
