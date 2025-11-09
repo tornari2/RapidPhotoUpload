@@ -109,6 +109,38 @@ export default function GalleryPage() {
     };
   }, []);
 
+  // Auto-refresh when window/tab comes into focus and periodic refresh
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Tab/window became visible, refresh photos
+        refresh();
+      }
+    };
+
+    const handleFocus = () => {
+      // Window gained focus, refresh photos
+      refresh();
+    };
+
+    // Listen for visibility changes and window focus
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // Periodic refresh every 30 seconds when tab is visible
+    const intervalId = setInterval(() => {
+      if (!document.hidden) {
+        refresh();
+      }
+    }, 30000); // 30 seconds
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(intervalId);
+    };
+  }, [refresh]);
+
   // Eagerly load all remaining photos after initial load completes
   // This effect will trigger loadMore whenever we're ready for the next page
   useEffect(() => {

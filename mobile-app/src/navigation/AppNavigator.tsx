@@ -4,25 +4,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { View, Text, StyleSheet } from 'react-native';
 
 // Import screens
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-
-// Placeholder screens for Main tabs - will be implemented in subsequent tasks
-import { View, Text, StyleSheet } from 'react-native';
-
-const PlaceholderScreen = ({ title }: { title: string }) => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderText}>{title}</Text>
-    <Text style={styles.placeholderSubtext}>Coming soon in next tasks</Text>
-  </View>
-);
-
-const HomeScreen = () => <PlaceholderScreen title="Home" />;
-const GalleryScreen = () => <PlaceholderScreen title="Gallery" />;
-const UploadScreen = () => <PlaceholderScreen title="Upload" />;
-const ProfileScreen = () => <PlaceholderScreen title="Profile" />;
+import GalleryScreen from '../screens/GalleryScreen';
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -35,10 +22,7 @@ export type AuthStackParamList = {
 };
 
 export type MainTabParamList = {
-  Home: undefined;
   Gallery: undefined;
-  Upload: undefined;
-  Profile: undefined;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -55,7 +39,7 @@ function AuthNavigator() {
   );
 }
 
-// Main Navigator (Home, Gallery, Upload, Profile)
+// Main Navigator (Gallery only - upload is integrated into gallery)
 function MainNavigator() {
   return (
     <MainTab.Navigator
@@ -77,42 +61,12 @@ function MainNavigator() {
       }}
     >
       <MainTab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <MainTab.Screen
         name="Gallery"
         component={GalleryScreen}
         options={{
           tabBarLabel: 'Gallery',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="images-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <MainTab.Screen
-        name="Upload"
-        component={UploadScreen}
-        options={{
-          tabBarLabel: 'Upload',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cloud-upload-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <MainTab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
           ),
         }}
       />
@@ -155,22 +109,5 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 18,
     color: '#F3F4F6',
-  },
-  placeholderContainer: {
-    flex: 1,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  placeholderText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#F3F4F6',
-    marginBottom: 8,
-  },
-  placeholderSubtext: {
-    fontSize: 16,
-    color: '#9CA3AF',
   },
 });

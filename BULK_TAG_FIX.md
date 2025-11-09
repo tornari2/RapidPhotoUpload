@@ -144,3 +144,4 @@ The fix ensures **all photos are properly found and tagged** in every bulk opera
 
 ⚠️ **Important**: You must restart the Spring Boot backend for these JPA repository changes to take effect. The repository interfaces are processed at startup time.
 
+

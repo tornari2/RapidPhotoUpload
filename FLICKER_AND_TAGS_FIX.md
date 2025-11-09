@@ -80,3 +80,4 @@ The `Photo` entity was missing the ManyToMany relationship to tags, and the `Pho
 
 The `photo_tags` junction table already exists in the database (from migration V6), so no database changes are needed.
 
+

@@ -57,7 +57,12 @@ export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   options: RetryOptions = {}
 ): Promise<T> {
-  const opts = { ...DEFAULT_RETRY_OPTIONS, ...options };
+  const opts = { 
+    ...DEFAULT_RETRY_OPTIONS, 
+    ...options,
+    // Only override onRetry if it's explicitly provided
+    onRetry: options.onRetry !== undefined ? options.onRetry : DEFAULT_RETRY_OPTIONS.onRetry,
+  };
   let lastError: any;
 
   for (let attempt = 0; attempt <= opts.maxRetries; attempt++) {
@@ -83,7 +88,11 @@ export async function retryWithBackoff<T>(
         opts.maxDelayMs,
         opts.backoffMultiplier
       );
-      opts.onRetry(attempt + 1, error);
+      
+      // Only call onRetry if it's a function
+      if (typeof opts.onRetry === 'function') {
+        opts.onRetry(attempt + 1, error);
+      }
 
       // Wait before retrying
       await sleep(delay);

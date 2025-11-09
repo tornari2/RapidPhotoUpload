@@ -25,12 +25,10 @@ export default function RegisterScreen() {
   const { login, checkAuth } = useAuth();
 
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<{
     username?: string;
-    email?: string;
     password?: string;
     confirmPassword?: string;
   }>({});
@@ -39,7 +37,6 @@ export default function RegisterScreen() {
   const validateForm = (): boolean => {
     const newErrors: {
       username?: string;
-      email?: string;
       password?: string;
       confirmPassword?: string;
     } = {};
@@ -48,12 +45,6 @@ export default function RegisterScreen() {
       newErrors.username = 'Username is required';
     } else if (username.length < 3) {
       newErrors.username = 'Username must be at least 3 characters';
-    }
-
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
     }
 
     if (!password) {
@@ -81,7 +72,6 @@ export default function RegisterScreen() {
     try {
       const response = await authService.register({
         username,
-        email,
         password,
       });
 
@@ -125,17 +115,6 @@ export default function RegisterScreen() {
               value={username}
               onChangeText={setUsername}
               error={errors.username}
-              autoCapitalize="none"
-              editable={!isLoading}
-            />
-
-            <TextInput
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              error={errors.email}
-              keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
             />

@@ -121,3 +121,4 @@ Potential future improvements:
 - Drag-and-drop folder support
 - Preview folder contents before uploading
 
+

@@ -19,11 +19,18 @@ export const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn('No auth token found in localStorage for request to:', config.url);
+    // Skip token check for auth endpoints (login, register)
+    const isAuthEndpoint = config.url?.includes('/auth/login') || 
+                          config.url?.includes('/auth/register') ||
+                          config.url?.includes('/auth/refresh');
+    
+    if (!isAuthEndpoint) {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        console.warn('No auth token found in localStorage for request to:', config.url);
+      }
     }
     return config;
   },

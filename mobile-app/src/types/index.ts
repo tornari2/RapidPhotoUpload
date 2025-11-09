@@ -74,12 +74,11 @@ export interface PaginatedResponse<T> {
 
 // Auth types
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  email: string;
   username: string;
   password: string;
 }

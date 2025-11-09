@@ -70,11 +70,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Allow web app origins
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://localhost:3000"
         ));
+        // Allow all methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Explicitly allow Authorization header for JWT tokens
         configuration.setAllowedHeaders(Arrays.asList(
@@ -91,6 +93,7 @@ public class SecurityConfig {
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Apply CORS to all paths
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

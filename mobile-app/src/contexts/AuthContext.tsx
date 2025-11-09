@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { getAccessToken, clearAuthTokens } from '../services/api';
 import { authService } from '../services/authService';
 
@@ -26,43 +26,50 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const hasCheckedAuthRef = useRef(false); // Prevent multiple checkAuth calls
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
+    // Prevent multiple simultaneous calls
+    if (hasCheckedAuthRef.current) {
+      return;
+    }
+    
+    hasCheckedAuthRef.current = true;
     try {
       setIsLoading(true);
       const token = await getAccessToken();
 
       if (token) {
-        // Token exists, try to get current user from backend
-        try {
-          const userData = await authService.getCurrentUser();
-          setUser(userData);
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-          // Token might be invalid, clear it
-          await clearAuthTokens();
-          setUser(null);
-        }
+        // Token exists, but backend doesn't have /api/auth/me endpoint
+        // If user is already set (from login), keep it
+        // Otherwise, don't set user with empty id - wait for actual login
+        setUser((currentUser) => {
+          // Only update if user is not already set
+          return currentUser || null;
+        });
       } else {
         setUser(null);
       }
     } catch (error) {
       console.error('Error checking auth:', error);
+      // Token might be invalid, clear it
+      await clearAuthTokens();
       setUser(null);
     } finally {
       setIsLoading(false);
+      hasCheckedAuthRef.current = false;
     }
-  };
+  }, []); // No dependencies - only run when explicitly called
 
   useEffect(() => {
     checkAuth();
+  }, []); // Only run once on mount
+
+  const login = useCallback((userData: User) => {
+    setUser(userData);
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-  };
-
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await authService.logout();
       setUser(null);
@@ -71,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Still clear user state even if logout fails
       setUser(null);
     }
-  };
+  }, []);
 
   // Ensure boolean values
   const isAuthenticatedValue = Boolean(user !== null);

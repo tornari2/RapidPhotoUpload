@@ -22,26 +22,22 @@ type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const { login, checkAuth } = useAuth();
+  const { login } = useAuth(); // Removed checkAuth - not needed
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { username?: string; password?: string } = {};
 
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+    if (!username) {
+      newErrors.username = 'Username is required';
     }
 
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
@@ -55,18 +51,28 @@ export default function LoginScreen() {
 
     setIsLoading(true);
     try {
-      const response = await authService.login({ email, password });
+      const response = await authService.login({ username, password });
       
-      // Update auth context
+      // Update auth context - this sets the user and triggers navigation
       login(response.user);
       
-      // Recheck auth state to trigger navigation
-      await checkAuth();
+      // No need to call checkAuth() - login() already set the user
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      // Provide more helpful error messages for network issues
+      let errorMessage = error.message || 'Unable to login. Please check your credentials and try again.';
+      
+      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+        errorMessage = 'Cannot connect to server. Please ensure:\n\n' +
+          '1. The backend server is running\n' +
+          '2. Your device/emulator can reach the server\n' +
+          '3. Check the console for the API URL being used';
+      }
+      
       Alert.alert(
         'Login Failed',
-        error.message || 'Unable to login. Please check your credentials and try again.'
+        errorMessage
       );
     } finally {
       setIsLoading(false);
@@ -92,12 +98,11 @@ export default function LoginScreen() {
           {/* Form */}
           <View style={styles.form}>
             <TextInput
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              error={errors.email}
-              keyboardType="email-address"
+              label="Username"
+              placeholder="Enter your username"
+              value={username}
+              onChangeText={setUsername}
+              error={errors.username}
               autoCapitalize="none"
               editable={!isLoading}
             />
