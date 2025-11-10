@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +37,11 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
      * Find photos by user ID and status with pagination
      */
     Page<Photo> findByUser_IdAndUploadStatus(UUID userId, PhotoStatus status, Pageable pageable);
+
+    /**
+     * Find photos by user ID and status without pagination
+     */
+    List<Photo> findByUser_IdAndUploadStatus(UUID userId, PhotoStatus status);
     
     /**
      * Find photos by user ID and upload job ID with pagination
@@ -52,5 +58,10 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
      * Find photo by ID and user ID (for authorization)
      */
     Optional<Photo> findByIdAndUser_Id(UUID id, UUID userId);
+
+    /**
+     * Find photos by status that were created before the given cutoff timestamp
+     */
+    List<Photo> findByUploadStatusAndCreatedAtBefore(PhotoStatus status, LocalDateTime cutoff);
 }
 

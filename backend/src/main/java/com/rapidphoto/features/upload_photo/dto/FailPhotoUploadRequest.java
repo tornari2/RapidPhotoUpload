@@ -18,8 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FailPhotoUploadRequest {
     
-    @NotNull(message = "Photo ID is required")
-    private UUID photoId;
+    private UUID photoId;  // Optional - can come from path variable
     
     @NotBlank(message = "Error message is required")
     private String errorMessage;

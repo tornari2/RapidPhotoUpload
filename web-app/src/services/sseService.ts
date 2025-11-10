@@ -14,10 +14,17 @@ export class SSEService {
     // Close existing connection if any
     this.disconnect();
 
-    // Use relative path to leverage Vite proxy
-    // Note: EventSource doesn't support custom headers, so authentication needs to be handled differently
-    // In production, consider using a different approach or ensuring the endpoint accepts token in query
-    const url = `/api/upload-jobs/${jobId}/status`;
+    // Determine API base (production builds provide VITE_API_BASE_URL)
+    const rawBase = import.meta.env.VITE_API_BASE_URL || '';
+    const base =
+      rawBase.length > 0
+        ? rawBase.replace(/\/$/, '')
+        : '';
+
+    const url =
+      base.length > 0
+        ? `${base}/upload-jobs/${jobId}/status`
+        : `/api/upload-jobs/${jobId}/status`;
 
     this.eventSource = new EventSource(url);
 

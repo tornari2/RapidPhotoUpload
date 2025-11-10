@@ -1859,11 +1859,45 @@
             "testStrategy": "Ensure all required fields are completed and listings are ready for submission."
           }
         ]
+      },
+      {
+        "id": 29,
+        "title": "Set Up CloudFront Distribution for S3 Static Website with HTTPS",
+        "description": "Configure CloudFront to serve the S3-hosted React frontend over HTTPS and update backend CORS settings to support secure uploads.",
+        "details": "1. Create a new CloudFront distribution with the S3 bucket as the origin.\n2. Configure the distribution to use an SSL certificate for HTTPS.\n3. Set up caching policies and behaviors for static assets.\n4. Update the S3 bucket policy to allow CloudFront access.\n5. Modify backend CORS settings to include the new CloudFront URL as an allowed origin.\n6. Redeploy the backend to apply CORS changes.",
+        "testStrategy": "1. Verify the CloudFront distribution serves the React frontend over HTTPS.\n2. Check that static assets are cached and served correctly.\n3. Test backend API calls from the frontend to ensure CORS settings allow requests.\n4. Confirm uploads from the HTTPS frontend work in Chrome without CORS errors.",
+        "status": "done",
+        "dependencies": [
+          14,
+          24,
+          25
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Plan CloudFront HTTPS rollout",
+            "description": "Outline the steps required to front the S3 static site with CloudFront and update backend CORS settings before executing changes.",
+            "details": "<info added on 2025-11-10T07:39:54.390Z>\nOutlined and executed CloudFront HTTPS rollout plan. Created `cloudfront-rapidphoto-config.json` in repo root with origin `rapidphoto-web-app.s3-website.us-east-2.amazonaws.com`. Provisioned CloudFront distribution (ID `EPF13RRXA3IIG`, domain `d1burddp911hjd.cloudfront.net`) forcing redirect-to-https viewers.\n</info added on 2025-11-10T07:39:54.390Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 29
+          },
+          {
+            "id": 2,
+            "title": "Execute CloudFront HTTPS rollout",
+            "description": "Provision CloudFront in front of S3, update CORS and redeploy backend, then verify uploads over HTTPS.",
+            "details": "<info added on 2025-11-10T07:40:27.260Z>\nCreated CloudFront distribution (ID EPF13RRXA3IIG, domain d1burddp911hjd.cloudfront.net) pointing at S3 static site and forcing HTTPS. Waiting for distribution status to move from InProgress to Deployed before switching the frontend URL and running final upload verification.\n</info added on 2025-11-10T07:40:27.260Z>\n<info added on 2025-11-10T07:51:03.995Z>\nCloudFront distribution EPF13RRXA3IIG is now Deployed. Switching frontend to use https://d1burddp911hjd.cloudfront.net. Preparing backend CORS update and redeployment.\n</info added on 2025-11-10T07:51:03.995Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 29
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-11-07T20:01:37.664Z",
-      "updated": "2025-11-10T03:13:23.112Z",
+      "updated": "2025-11-10T07:53:56.747Z",
       "description": "Tasks for master context"
     }
   }

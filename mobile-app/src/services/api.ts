@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 // Determine the correct API base URL based on the environment
 const getApiBaseUrl = (): string => {
   if (!__DEV__) {
-    return 'https://your-production-api.com'; // Production API URL
+    return 'https://d21zoepcm3h6ut.cloudfront.net/api'; // Production API URL
   }
 
   // Development mode - detect platform and use appropriate URL

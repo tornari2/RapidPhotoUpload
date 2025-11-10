@@ -1,6 +1,8 @@
 com/rapidphoto/domain/Photo.class
 com/rapidphoto/features/get_photos/GetUserPhotosQuery.class
 com/rapidphoto/domain/UploadJobStatus.class
+com/rapidphoto/infrastructure/config/HealthController.class
+com/rapidphoto/infrastructure/config/SchedulingConfig.class
 com/rapidphoto/features/get_photos/dto/PhotoResponse$TagDto$TagDtoBuilder.class
 com/rapidphoto/features/tag_photo/BulkTagPhotosCommand$BulkTagPhotosCommandBuilder.class
 com/rapidphoto/features/upload_photo/dto/CreateUploadJobRequest$CreateUploadJobRequestBuilder.class
@@ -24,6 +26,7 @@ com/rapidphoto/features/upload_photo/PhotoController$SuccessResponse.class
 com/rapidphoto/features/retry_upload/dto/RetryUploadResponse$RetryUploadResponseBuilder.class
 com/rapidphoto/features/upload_photo/FailPhotoUploadCommand.class
 com/rapidphoto/features/get_photos/GetPhotoMetadataQuery.class
+com/rapidphoto/infrastructure/config/AdminController.class
 com/rapidphoto/features/auth/dto/RegisterRequest$RegisterRequestBuilder.class
 com/rapidphoto/features/get_photos/dto/PhotoResponse$PhotoResponseBuilder.class
 com/rapidphoto/features/upload_photo/dto/FailPhotoUploadRequest.class
@@ -53,7 +56,9 @@ com/rapidphoto/infrastructure/config/SecurityConfig.class
 com/rapidphoto/features/upload_photo/DeletePhotoCommand.class
 com/rapidphoto/features/tag_photo/BulkTagPhotosHandler.class
 com/rapidphoto/features/upload_photo/CreateUploadJobCommand.class
+com/rapidphoto/features/get_photos/GetPhotosController$ErrorResponse.class
 com/rapidphoto/infrastructure/security/JwtAuthenticationFilter.class
+com/rapidphoto/features/upload_photo/StalledUploadCleanupService.class
 com/rapidphoto/features/tag_photo/dto/TagPhotoResponse.class
 com/rapidphoto/features/tag_photo/dto/TagPhotoResponse$TagPhotoResponseBuilder.class
 com/rapidphoto/features/upload_photo/repository/UploadJobRepository.class
@@ -64,6 +69,7 @@ com/rapidphoto/features/upload_photo/dto/CreateUploadJobResponse$CreateUploadJob
 com/rapidphoto/features/tag_photo/dto/BulkTagPhotosRequest.class
 com/rapidphoto/features/tag_photo/repository/TagRepository.class
 com/rapidphoto/features/get_photos/dto/GetUserPhotosResponse.class
+com/rapidphoto/infrastructure/config/TestSecurityConfig.class
 com/rapidphoto/features/upload_photo/UploadPhotoController$ErrorResponse.class
 com/rapidphoto/infrastructure/s3/S3ServiceImpl.class
 com/rapidphoto/features/upload_photo/dto/CreateUploadJobResponse.class

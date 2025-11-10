@@ -36,7 +36,7 @@ public class GetPhotosController {
      * @return GetUserPhotosResponse with paginated photos
      */
     @GetMapping
-    public ResponseEntity<GetUserPhotosResponse> getUserPhotos(
+    public ResponseEntity<?> getUserPhotos(
             @RequestParam UUID userId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) UUID uploadJobId,
@@ -47,10 +47,24 @@ public class GetPhotosController {
         
         log.info("GET /api/photos - userId: {}, status: {}, uploadJobId: {}, page: {}, size: {}", 
                 userId, status, uploadJobId, page, size);
+
+        com.rapidphoto.domain.PhotoStatus statusFilter = null;
+
+        if (status == null || status.isBlank()) {
+            statusFilter = com.rapidphoto.domain.PhotoStatus.COMPLETED;
+        } else if (!"all".equalsIgnoreCase(status)) {
+            try {
+                statusFilter = com.rapidphoto.domain.PhotoStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                log.warn("Invalid status value received: {}", status);
+                return ResponseEntity.badRequest()
+                        .body(new ErrorResponse("Invalid status value", "Supported values: completed, failed, uploading, all"));
+            }
+        }
         
         GetUserPhotosQuery query = GetUserPhotosQuery.builder()
                 .userId(userId)
-                .status(status != null ? com.rapidphoto.domain.PhotoStatus.valueOf(status.toUpperCase()) : null)
+                .status(statusFilter)
                 .uploadJobId(uploadJobId)
                 .page(page)
                 .size(size)
@@ -92,5 +106,7 @@ public class GetPhotosController {
         PhotoMetadataResponse response = getPhotoMetadataHandler.handle(query);
         return ResponseEntity.ok(response);
     }
+
+    private record ErrorResponse(String error, String message) {}
 }
 

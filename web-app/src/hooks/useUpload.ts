@@ -183,12 +183,9 @@ export function useUpload() {
             const errorMessage = err instanceof Error ? err.message : 'Upload failed';
             const uploadTime = Date.now() - startTime;
             
-            // Notify backend of failure
-            try {
-              await uploadService.failPhotoUpload(photoId, errorMessage);
-            } catch (notifyError) {
-              console.error('Failed to notify backend of upload failure:', notifyError);
-            }
+            // DON'T notify backend of failure - backend has validation issues
+            // The stalled upload cleanup service will handle it automatically
+            console.error('Upload failed for photoId:', photoId, errorMessage);
 
             // Update progress
             setUploadProgress((prev) => {

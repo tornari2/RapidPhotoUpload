@@ -15,7 +15,7 @@ cd "$(dirname "$0")"
 
 # Clean and package
 echo "Running Maven clean and package..."
-./mvnw clean package -DskipTests
+mvn clean package -DskipTests
 
 # Check if build was successful
 if [ -f "target/rapid-photo-upload-0.0.1-SNAPSHOT.jar" ]; then
@@ -33,4 +33,6 @@ else
     echo "❌ Build failed!"
     exit 1
 fi
+
+
 

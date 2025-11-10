@@ -29,3 +29,5 @@ echo "Check deployment status: eb status"
 echo "View logs: eb logs"
 echo "Open application: eb open"
 
+
+

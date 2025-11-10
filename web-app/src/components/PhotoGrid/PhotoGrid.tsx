@@ -58,8 +58,17 @@ export function PhotoGrid({
     });
   }, []);
 
-  // Don't reset loaded photos - keep them persistent for smooth scrolling
-  // Only reset if the photo IDs completely change (e.g., user switch)
+  // Reset loaded photos and thumbnail URLs when photos array becomes empty
+  useEffect(() => {
+    if (photos.length === 0) {
+      setLoadedPhotoIds(new Set());
+      setThumbnailUrls(new Map());
+      thumbnailUrlsRef.current = new Map();
+      if (onLoadedCountChange) {
+        onLoadedCountChange(0);
+      }
+    }
+  }, [photos.length, onLoadedCountChange]);
 
   // Notify parent when loaded count changes
   useEffect(() => {
@@ -74,6 +83,9 @@ export function PhotoGrid({
 
   // Prefetch thumbnail URLs for all photos in batches
   useEffect(() => {
+    // Don't prefetch if there are no photos
+    if (photos.length === 0) return;
+
     const prefetchThumbnailUrls = async () => {
       // Get photos that don't have cached URLs yet
       const photosToPrefetch = photos.filter(
@@ -222,8 +234,8 @@ export function PhotoGrid({
         })}
       </div>
 
-      {/* Infinite scroll trigger */}
-      {hasNextPage && (
+      {/* Infinite scroll trigger - only show if we have photos */}
+      {hasNextPage && photos.length > 0 && (
         <div ref={observerTarget} className="h-20 flex items-center justify-center px-8">
           {isLoadingMore && (
             <div className="w-full max-w-md">

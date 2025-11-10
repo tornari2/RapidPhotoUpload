@@ -17,7 +17,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CompletePhotoUploadRequest {
     
-    @NotNull(message = "Photo ID is required")
-    private UUID photoId;
+    private UUID photoId;  // Optional - can come from path variable
 }
 

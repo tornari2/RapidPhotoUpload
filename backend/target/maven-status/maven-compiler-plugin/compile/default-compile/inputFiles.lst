@@ -14,6 +14,7 @@
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/auth/dto/RegisterRequest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/retry_upload/RetryUploadCommand.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/get_photos/dto/PhotoMetadataResponse.java
+/Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/config/SchedulingConfig.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/domain/UploadJob.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/get_photos/GetUserPhotosHandler.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/dto/FailPhotoUploadRequest.java
@@ -40,6 +41,7 @@
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/dto/CreateUploadJobResponse.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/repository/UploadJobRepository.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/repository/PhotoRepository.java
+/Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/StalledUploadCleanupService.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/retry_upload/dto/RetryUploadResponse.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/tag_photo/dto/TagPhotoRequest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/auth/repository/UserRepository.java
@@ -50,6 +52,7 @@
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/download_photo/dto/DownloadPhotoResponse.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/CompletePhotoUploadHandler.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/get_photos/GetPhotosController.java
+/Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/config/TestSecurityConfig.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/security/JwtTokenProvider.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/auth/dto/RefreshTokenRequest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/auth/dto/LoginResponse.java
@@ -61,6 +64,7 @@
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/get_photos/GetUserPhotosQuery.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_status/UploadStatusController.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/s3/S3Service.java
+/Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/config/HealthController.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/tag_photo/repository/TagRepository.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/security/JwtAuthenticationFilter.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/auth/AuthController.java
@@ -71,3 +75,4 @@
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/upload_photo/CreateUploadJobCommand.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/tag_photo/dto/TagPhotoResponse.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/features/retry_upload/dto/RetryUploadRequest.java
+/Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/main/java/com/rapidphoto/infrastructure/config/AdminController.java

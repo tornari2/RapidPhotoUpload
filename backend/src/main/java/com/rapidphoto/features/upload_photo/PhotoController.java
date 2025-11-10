@@ -1,6 +1,7 @@
 package com.rapidphoto.features.upload_photo;
 
 import com.rapidphoto.domain.Photo;
+import com.rapidphoto.domain.PhotoStatus;
 import com.rapidphoto.features.upload_photo.dto.CompletePhotoUploadRequest;
 import com.rapidphoto.features.upload_photo.dto.FailPhotoUploadRequest;
 import com.rapidphoto.features.upload_photo.repository.PhotoRepository;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -153,6 +155,67 @@ public class PhotoController {
             log.error("Error deleting photo: {}", photoId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponse("Failed to delete photo", e.getMessage()));
+        }
+    }
+    
+    /**
+     * Delete all photos stuck in UPLOADING status for a user
+     * Useful for cleaning up stalled uploads that never completed
+     *
+     * @param userId User ID whose pending uploads should be removed
+     * @return Success response with count of deleted photos
+     */
+    @DeleteMapping("/cleanup/uploading")
+    public ResponseEntity<?> deleteUploadingPhotos(@RequestParam UUID userId) {
+        
+        log.warn("Cleaning up uploading photos for user: {}", userId);
+        
+        try {
+            List<Photo> uploadingPhotos = photoRepository.findByUser_IdAndUploadStatus(
+                    userId, PhotoStatus.UPLOADING);
+            
+            if (uploadingPhotos.isEmpty()) {
+                log.info("No uploading photos found for cleanup for user: {}", userId);
+                return ResponseEntity.ok(new SuccessResponse("No uploading photos found to delete"));
+            }
+            
+            uploadingPhotos.forEach(photo -> {
+                DeletePhotoCommand command = DeletePhotoCommand.builder()
+                        .photoId(photo.getId())
+                        .userId(userId)
+                        .build();
+                deletePhotoHandler.handle(command);
+            });
+            
+            log.info("Deleted {} uploading photos for user: {}", uploadingPhotos.size(), userId);
+            return ResponseEntity.ok(new SuccessResponse(
+                    String.format("Deleted %d uploading photos", uploadingPhotos.size())));
+        } catch (Exception e) {
+            log.error("Error deleting uploading photos for user: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to delete uploading photos", e.getMessage()));
+        }
+    }
+    
+    /**
+     * Delete ALL photos (ADMIN ONLY - FOR TESTING)
+     * Deletes all photos from both the database and S3
+     * 
+     * @return Success response
+     */
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<?> deleteAllPhotos() {
+        
+        log.warn("🔥 DELETING ALL PHOTOS FROM DATABASE!");
+        
+        try {
+            photoRepository.deleteAll();
+            log.info("Successfully deleted all photos");
+            return ResponseEntity.ok(new SuccessResponse("All photos deleted successfully"));
+        } catch (Exception e) {
+            log.error("Error deleting all photos", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to delete all photos", e.getMessage()));
         }
     }
     

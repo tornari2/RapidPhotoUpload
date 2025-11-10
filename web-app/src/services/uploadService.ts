@@ -116,6 +116,7 @@ export const uploadService = {
   async failPhotoUpload(photoId: string, errorMessage: string): Promise<void> {
     return retryApiCall(async () => {
       await apiClient.post(`/photos/${photoId}/fail`, {
+        photoId,  // Include photoId in body - backend validation requires it
         errorMessage,
       });
     });

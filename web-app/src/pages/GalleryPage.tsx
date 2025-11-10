@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePhotos } from '../hooks/usePhotos';
 import { useUpload } from '../hooks/useUpload';
@@ -44,12 +44,57 @@ export default function GalleryPage() {
     sortDirection: 'desc',
   });
 
-  const { uploadPhotos, uploadProgress } = useUpload();
+  const { uploadPhotos, uploadProgress, resetUpload } = useUpload();
   const { photoProgress: downloadProgress } = useDownload();
   const { tagPhoto, isLoading: isTagging } = useTags();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
+  const stalledUploadLastUpdateRef = useRef<number>(Date.now());
+  const consecutiveErrorCountRef = useRef<number>(0);
+  const lastRefreshTimeRef = useRef<number>(Date.now());
+  const lastErrorRef = useRef<Error | null>(null);
+  const handleClearStalledUploads = useCallback(() => {
+    setUploadingPhotos(new Map());
+    setSelectedPhotos(new Set());
+    resetUpload();
+    refresh();
+  }, [refresh, resetUpload]);
+
+  useEffect(() => {
+    if (uploadProgress) {
+      stalledUploadLastUpdateRef.current = Date.now();
+    }
+  }, [uploadProgress]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const hasUploadingPhotos = uploadingPhotos.size > 0;
+      const jobActive = uploadProgress?.status === 'uploading';
+      const lastUpdateAge = Date.now() - stalledUploadLastUpdateRef.current;
+      const isStale = lastUpdateAge > 60000; // 60 seconds without progress
+
+      if (hasUploadingPhotos && (!jobActive || isStale)) {
+        handleClearStalledUploads();
+      }
+    }, 15000); // check every 15 seconds
+
+    return () => clearInterval(interval);
+  }, [uploadingPhotos, uploadProgress, handleClearStalledUploads]);
+
+  // Clear uploading photos when all photos are deleted
+  useEffect(() => {
+    if (loadedPhotos.length === 0 && uploadingPhotos.size > 0) {
+      setUploadingPhotos(new Map());
+    }
+  }, [loadedPhotos.length, uploadingPhotos.size]);
+
+  // 🔥 CLEAR ALL STUCK UPLOADING PHOTOS ON MOUNT
+  useEffect(() => {
+    setUploadingPhotos(new Map());
+    resetUpload();
+    setLoadedCount(0);
+  }, [resetUpload]);
 
   // Combine loaded photos with uploading photos and apply tag updates
   const allPhotos = useMemo(() => {
@@ -71,7 +116,6 @@ export default function GalleryPage() {
   }, [loadedPhotos, uploadingPhotos, photoTagUpdates]);
 
   // Calculate how many photos are currently loading
-  // Use min to prevent negative or inflated values during deletion/addition transitions
   const photosCurrentlyLoading = useMemo(() => {
     const nonUploadingPhotos = allPhotos.filter(p => p.uploadStatus !== 'UPLOADING');
     const effectiveLoadedCount = Math.min(loadedCount, nonUploadingPhotos.length);
@@ -81,8 +125,11 @@ export default function GalleryPage() {
   // Sync loadedCount when allPhotos changes (handles deletions/additions)
   useEffect(() => {
     const nonUploadingPhotos = allPhotos.filter(p => p.uploadStatus !== 'UPLOADING');
-    // If we have fewer photos than loaded count, adjust it down (photo was deleted)
-    if (nonUploadingPhotos.length < loadedCount) {
+    // If we have no photos, reset loaded count to 0
+    if (nonUploadingPhotos.length === 0) {
+      setLoadedCount(0);
+    } else if (nonUploadingPhotos.length < loadedCount) {
+      // If we have fewer photos than loaded count, adjust it down (photo was deleted)
       setLoadedCount(nonUploadingPhotos.length);
     }
   }, [allPhotos, loadedCount]);
@@ -109,37 +156,88 @@ export default function GalleryPage() {
     };
   }, []);
 
+  // Track errors and reset consecutive error count on successful refresh
+  useEffect(() => {
+    if (error) {
+      // Only increment if we're not currently loading (error occurred after load completed)
+      // and this is a new error (not the same error we already counted)
+      if (!isLoading && !isLoadingMore && error !== lastErrorRef.current) {
+        consecutiveErrorCountRef.current = Math.min(consecutiveErrorCountRef.current + 1, 3);
+        lastErrorRef.current = error;
+      }
+    } else {
+      // Reset error count on successful load (when error clears and we're not loading)
+      if (!isLoading && !isLoadingMore) {
+        consecutiveErrorCountRef.current = 0;
+        lastErrorRef.current = null;
+      }
+    }
+  }, [error, isLoading, isLoadingMore]);
+
   // Auto-refresh when window/tab comes into focus and periodic refresh
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // Tab/window became visible, refresh photos
+        // Tab/window became visible, refresh photos (always allow user-initiated refresh)
         refresh();
+        consecutiveErrorCountRef.current = 0; // Reset error count on user action
       }
     };
 
     const handleFocus = () => {
-      // Window gained focus, refresh photos
+      // Window gained focus, refresh photos (always allow user-initiated refresh)
       refresh();
+      consecutiveErrorCountRef.current = 0; // Reset error count on user action
     };
 
     // Listen for visibility changes and window focus
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
 
-    // Periodic refresh every 30 seconds when tab is visible
-    const intervalId = setInterval(() => {
-      if (!document.hidden) {
-        refresh();
+    // Periodic refresh with exponential backoff when errors occur
+    const getRefreshInterval = () => {
+      // If we have consecutive errors, use exponential backoff
+      // 1 error: 30s (normal)
+      // 2 errors: 60s
+      // 3+ errors: 120s (max)
+      const errorCount = consecutiveErrorCountRef.current;
+      if (errorCount === 0) {
+        return 30000; // 30 seconds - normal interval
+      } else if (errorCount === 1) {
+        return 60000; // 60 seconds - first backoff
+      } else {
+        return 120000; // 120 seconds - max backoff
       }
-    }, 30000); // 30 seconds
+    };
+
+    const scheduleNextRefresh = () => {
+      const interval = getRefreshInterval();
+      const timeSinceLastRefresh = Date.now() - lastRefreshTimeRef.current;
+      
+      // Only refresh if:
+      // 1. Tab is visible
+      // 2. Enough time has passed since last refresh
+      // 3. Not currently loading
+      // 4. Either no error, or we've waited long enough (exponential backoff)
+      if (!document.hidden && timeSinceLastRefresh >= interval && !isLoading && !isLoadingMore) {
+        // Skip refresh if we have persistent errors (3+ consecutive)
+        // This prevents infinite loops of 500 errors
+        if (consecutiveErrorCountRef.current < 3) {
+          lastRefreshTimeRef.current = Date.now();
+          refresh();
+        }
+      }
+    };
+
+    // Check every 10 seconds if we should refresh
+    const intervalId = setInterval(scheduleNextRefresh, 10000);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
       clearInterval(intervalId);
     };
-  }, [refresh]);
+  }, [refresh, isLoading, isLoadingMore]);
 
   // Eagerly load all remaining photos after initial load completes
   // This effect will trigger loadMore whenever we're ready for the next page
@@ -568,6 +666,7 @@ export default function GalleryPage() {
 
 
   const selectedPhotosList = allPhotos.filter((p) => selectedPhotos.has(p.id));
+  const hasStalledUploads = uploadingPhotos.size > 0;
 
   if (!user) {
     return (
@@ -596,6 +695,14 @@ export default function GalleryPage() {
           </div>
           
           <div className="flex items-center gap-3" id="gallery-header-actions">
+            {hasStalledUploads && (
+              <button
+                onClick={handleClearStalledUploads}
+                className="px-4 py-2 text-sm font-medium text-black bg-yellow-400 border border-yellow-300 rounded-md hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
+              >
+                Clear Stalled Uploads
+              </button>
+            )}
             <HeaderUploadButton />
             {selectedPhotos.size > 0 && (
               <>
@@ -658,8 +765,8 @@ export default function GalleryPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto max-w-7xl w-full mx-auto px-6 lg:px-8 pt-6 pb-6">
-        {/* Global loading progress bar - only show when 2+ photos are loading simultaneously */}
-        {!showLoadingScreen && !isDeleting && photosCurrentlyLoading >= 2 && (
+        {/* Global loading progress bar - only show when 2+ photos are loading simultaneously AND we have photos */}
+        {!showLoadingScreen && !isDeleting && photosCurrentlyLoading >= 2 && allPhotos.length > 0 && (
           <div className="mb-6 px-8">
             <div className="w-full max-w-2xl mx-auto">
               <ProgressBar 
