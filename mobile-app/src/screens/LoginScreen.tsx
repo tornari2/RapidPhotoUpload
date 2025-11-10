@@ -91,8 +91,8 @@ export default function LoginScreen() {
         <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Login to continue uploading photos</Text>
+            <Text style={styles.title}>Rapid Photo Upload</Text>
+            <Text style={styles.subtitle}>Login to begin uploading photos</Text>
           </View>
 
           {/* Form */}

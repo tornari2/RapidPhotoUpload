@@ -9,11 +9,11 @@ import {
   Dimensions,
   FlatList,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { photoService } from '../../services/photoService';
+import { TagInput } from '../Tagging/TagInput';
 import type { Photo } from '../../types';
 
 const { width, height } = Dimensions.get('window');
@@ -25,6 +25,7 @@ interface PhotoViewerProps {
   onDownload?: (photo: Photo) => void;
   onTag?: (photo: Photo) => void;
   onDelete?: (photo: Photo) => void;
+  onRefresh?: () => Promise<void>;
 }
 
 export const PhotoViewer: React.FC<PhotoViewerProps> = ({
@@ -34,13 +35,18 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   onDownload,
   onTag,
   onDelete,
+  onRefresh,
 }) => {
   const initialIndex = photos.findIndex((p) => p.id === photo.id);
   const [currentIndex, setCurrentIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
   const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
   const [loadingUrls, setLoadingUrls] = useState<Set<string>>(new Set());
+  const [showTagInput, setShowTagInput] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const loadedUrlsRef = useRef<Set<string>>(new Set());
+  // Refs to track current state values without causing re-renders
+  const imageUrlsRef = useRef<Map<string, string>>(new Map());
+  const loadingUrlsRef = useRef<Set<string>>(new Set());
   const currentPhoto = photos[currentIndex] || photo;
 
   useEffect(() => {
@@ -56,6 +62,8 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       const index = viewableItems[0].index;
       if (index !== null && index !== currentIndex) {
         setCurrentIndex(index);
+        // Close tag input when photo changes
+        setShowTagInput(false);
       }
     }
   }).current;
@@ -67,11 +75,15 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   // Load download URLs for photos
   useEffect(() => {
     const loadUrls = async () => {
+      // Use refs to get current state values
+      const currentImageUrls = imageUrlsRef.current;
+      const currentLoadingUrls = loadingUrlsRef.current;
+      
       // Only load URLs for completed photos
       const photosToLoad = photos.filter(
         (p) => p.uploadStatus === 'COMPLETED' &&
-               !imageUrls.has(p.id) && 
-               !loadingUrls.has(p.id) && 
+               !currentImageUrls.has(p.id) && 
+               !currentLoadingUrls.has(p.id) && 
                !loadedUrlsRef.current.has(p.id)
       );
 
@@ -81,6 +93,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       setLoadingUrls((prev) => {
         const updated = new Set(prev);
         photosToLoad.forEach((p) => updated.add(p.id));
+        loadingUrlsRef.current = updated; // Update ref
         return updated;
       });
 
@@ -105,6 +118,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
               loadedUrlsRef.current.add(result.photoId);
             }
           });
+          imageUrlsRef.current = updated; // Update ref
           return updated;
         });
       } finally {
@@ -112,6 +126,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
         setLoadingUrls((prev) => {
           const updated = new Set(prev);
           photosToLoad.forEach((p) => updated.delete(p.id));
+          loadingUrlsRef.current = updated; // Update ref
           return updated;
         });
       }
@@ -124,11 +139,15 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   // Retry loading URLs for photos that become completed
   useEffect(() => {
     const retryInterval = setInterval(() => {
+      // Use refs to access current state values without causing re-renders
+      const currentImageUrls = imageUrlsRef.current;
+      const currentLoadingUrls = loadingUrlsRef.current;
+      
       // Check if any photos became completed and need URLs loaded
       const completedPhotosNeedingUrls = photos.filter(
         (p) => p.uploadStatus === 'COMPLETED' &&
-               !imageUrls.has(p.id) && 
-               !loadingUrls.has(p.id) && 
+               !currentImageUrls.has(p.id) && 
+               !currentLoadingUrls.has(p.id) && 
                !loadedUrlsRef.current.has(p.id)
       );
       
@@ -142,6 +161,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
           setLoadingUrls((prev) => {
             const updated = new Set(prev);
             photosToLoad.forEach((p) => updated.add(p.id));
+            loadingUrlsRef.current = updated; // Update ref
             return updated;
           });
 
@@ -166,12 +186,14 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
                   loadedUrlsRef.current.add(result.photoId);
                 }
               });
+              imageUrlsRef.current = updated; // Update ref
               return updated;
             });
           } finally {
             setLoadingUrls((prev) => {
               const updated = new Set(prev);
               photosToLoad.forEach((p) => updated.delete(p.id));
+              loadingUrlsRef.current = updated; // Update ref
               return updated;
             });
           }
@@ -182,7 +204,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
     }, 10000); // Check every 10 seconds
 
     return () => clearInterval(retryInterval);
-  }, [photos, imageUrls, loadingUrls]);
+  }, [photos]); // Only depend on photos, not on imageUrls or loadingUrls
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -196,44 +218,28 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
     }
   };
 
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Photo',
-      'Are you sure you want to delete this photo? This action cannot be undone.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (onDelete) {
-              const photoToDelete = currentPhoto;
-              const deleteIndex = currentIndex;
-              
-              // Determine navigation before deletion
-              const shouldNavigateToPrevious = deleteIndex === photos.length - 1 && deleteIndex > 0;
-              const shouldClose = photos.length === 1;
-              
-              await onDelete(photoToDelete);
-              
-              // Handle navigation after deletion
-              if (shouldClose) {
-                // Was the only photo, close viewer
-                onClose();
-              } else if (shouldNavigateToPrevious) {
-                // Was last photo, navigate to previous
-                setCurrentIndex(deleteIndex - 1);
-              }
-              // Otherwise, stay at same index (next photo will move into position)
-              // The parent's refresh will update the photos array and the viewer will adjust
-            }
-          },
-        },
-      ]
-    );
+  const handleDelete = async () => {
+    if (onDelete) {
+      const photoToDelete = currentPhoto;
+      const deleteIndex = currentIndex;
+      
+      // Determine navigation before deletion
+      const shouldNavigateToPrevious = deleteIndex === photos.length - 1 && deleteIndex > 0;
+      const shouldClose = photos.length === 1;
+      
+      await onDelete(photoToDelete);
+      
+      // Handle navigation after deletion
+      if (shouldClose) {
+        // Was the only photo, close viewer
+        onClose();
+      } else if (shouldNavigateToPrevious) {
+        // Was last photo, navigate to previous
+        setCurrentIndex(deleteIndex - 1);
+      }
+      // Otherwise, stay at same index (next photo will move into position)
+      // The parent's refresh will update the photos array and the viewer will adjust
+    }
   };
 
   return (
@@ -243,39 +249,11 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
           <TouchableOpacity 
             onPress={onClose} 
             style={styles.closeButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            activeOpacity={0.7}
           >
-            <Ionicons name="close" size={28} color="#F3F4F6" />
+            <Ionicons name="close" size={32} color="#F3F4F6" />
           </TouchableOpacity>
-          <View style={styles.headerRight}>
-            {onTag && (
-              <TouchableOpacity
-                onPress={() => onTag(currentPhoto)}
-                style={styles.headerButton}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons name="pricetag-outline" size={24} color="#F3F4F6" />
-              </TouchableOpacity>
-            )}
-            {onDownload && (
-              <TouchableOpacity
-                onPress={() => onDownload(currentPhoto)}
-                style={styles.headerButton}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons name="download-outline" size={24} color="#F3F4F6" />
-              </TouchableOpacity>
-            )}
-            {onDelete && (
-              <TouchableOpacity
-                onPress={handleDelete}
-                style={styles.headerButton}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons name="trash-outline" size={24} color="#EF4444" />
-              </TouchableOpacity>
-            )}
-          </View>
         </View>
 
         <FlatList
@@ -362,6 +340,53 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             </Text>
           </View>
         )}
+
+        <View style={styles.actionBar}>
+          {onTag && (
+            <TouchableOpacity
+              onPress={() => setShowTagInput(true)}
+              style={styles.actionButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="pricetag-outline" size={28} color="#F3F4F6" />
+              <Text style={styles.actionButtonLabel}>Tag</Text>
+            </TouchableOpacity>
+          )}
+          {onDownload && (
+            <TouchableOpacity
+              onPress={() => onDownload(currentPhoto)}
+              style={styles.actionButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="download-outline" size={28} color="#F3F4F6" />
+              <Text style={styles.actionButtonLabel}>Download</Text>
+            </TouchableOpacity>
+          )}
+          {onDelete && (
+            <TouchableOpacity
+              onPress={handleDelete}
+              style={styles.actionButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="trash-outline" size={28} color="#EF4444" />
+              <Text style={[styles.actionButtonLabel, styles.deleteButtonLabel]}>Delete</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {showTagInput && (
+          <TagInput
+            photo={currentPhoto}
+            visible={showTagInput}
+            onClose={() => setShowTagInput(false)}
+            onTagged={() => {
+              setShowTagInput(false);
+              // Don't refresh - tags are already updated on the backend
+              // and the modal closing will allow the UI to update naturally
+              onTag?.(currentPhoto);
+            }}
+          />
+        )}
       </SafeAreaView>
     </Modal>
   );
@@ -374,7 +399,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -384,22 +409,13 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   closeButton: {
-    padding: 8,
-    minWidth: 44,
-    minHeight: 44,
+    padding: 12,
+    minWidth: 56,
+    minHeight: 56,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  headerRight: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  headerButton: {
-    padding: 8,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 28,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   imageContainer: {
     width,
@@ -447,6 +463,33 @@ const styles = StyleSheet.create({
   tagsText: {
     color: '#F3F4F6',
     fontSize: 14,
+  },
+  actionBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    paddingBottom: 32,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    borderTopWidth: 1,
+    borderTopColor: '#1F2937',
+  },
+  actionButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    minWidth: 80,
+  },
+  actionButtonLabel: {
+    color: '#F3F4F6',
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  deleteButtonLabel: {
+    color: '#EF4444',
   },
   uploadingText: {
     color: '#9CA3AF',

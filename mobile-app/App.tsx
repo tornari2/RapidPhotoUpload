@@ -7,6 +7,7 @@ import { StyleSheet } from 'react-native';
 
 import { store } from './src/store';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { ToastProvider } from './src/contexts/ToastContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
@@ -15,8 +16,10 @@ export default function App() {
       <SafeAreaProvider>
         <Provider store={store}>
           <AuthProvider>
-            <StatusBar style="light" />
-            <AppNavigator />
+            <ToastProvider>
+              <StatusBar style="light" />
+              <AppNavigator />
+            </ToastProvider>
           </AuthProvider>
         </Provider>
       </SafeAreaProvider>

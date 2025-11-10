@@ -77,31 +77,27 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    // Enhanced error logging for network issues
-    if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
-      console.error('[API] Network Error Details:', {
-        message: error.message,
-        code: error.code,
-        baseURL: API_BASE_URL,
-        url: error.config?.url,
-        platform: Platform.OS,
-        suggestion: Platform.OS === 'ios' 
-          ? 'If using iOS Simulator, ensure backend is running on localhost:8080. For physical device, update API_BASE_URL to your computer IP.'
-          : Platform.OS === 'android'
-          ? 'If using Android Emulator, ensure backend is running and accessible via 10.0.2.2:8080. For physical device, update API_BASE_URL to your computer IP.'
-          : 'Ensure backend is running and device/emulator can reach it',
+    const originalRequest = error.config as any;
+
+    // Enhanced error logging for 403 errors
+    if (error.response?.status === 403) {
+      const hasToken = !!(await SecureStore.getItemAsync(ACCESS_TOKEN_KEY));
+      console.error('[API] 403 Forbidden Error Details:', {
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+        message: error.response?.data?.message || error.message,
+        hasToken,
+        suggestion: 'This may indicate: 1) Token expired or invalid, 2) User ID mismatch, 3) Insufficient permissions',
       });
     }
-
-    const originalRequest = error.config as any;
 
     // Don't try to refresh token for login/register endpoints or refresh endpoint itself
     const isAuthEndpoint = originalRequest?.url?.includes('/api/auth/login') || 
                           originalRequest?.url?.includes('/api/auth/register') ||
                           originalRequest?.url?.includes('/api/auth/refresh');
 
-    // If error is 401 and we haven't tried to refresh yet (and it's not an auth endpoint)
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+    // If error is 401 or 403 and we haven't tried to refresh yet (and it's not an auth endpoint)
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -129,11 +125,20 @@ apiClient.interceptors.response.use(
         }
       } catch (refreshError) {
         // Refresh failed, clear tokens and force re-login
+        console.error('[API] Token refresh failed:', refreshError);
         await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
         await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
         // You can dispatch a logout action here if using Redux
         return Promise.reject(refreshError);
       }
+    }
+    
+    // If 403 persists after refresh attempt, it's likely a real authorization issue
+    // (e.g., user ID mismatch, insufficient permissions)
+    if (error.response?.status === 403 && originalRequest._retry) {
+      console.error('[API] 403 Forbidden persisted after token refresh - likely authorization issue');
+      // Don't clear tokens here as it might be a temporary issue
+      // But log it for debugging
     }
     
     // For auth endpoints with 401, clear any stale tokens

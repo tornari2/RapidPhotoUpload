@@ -47,8 +47,12 @@ export const TagInput: React.FC<TagInputProps> = ({
   const handleSave = async () => {
     try {
       await tagPhoto(photo.id, selectedTags);
+      // Call onTagged first, then close after a brief delay to allow UI to update
       onTagged();
-      onClose();
+      // Use setTimeout to ensure onTagged callbacks complete before closing
+      setTimeout(() => {
+        onClose();
+      }, 50);
     } catch (error: any) {
       console.error('Failed to tag photo:', error);
       // You might want to show an alert here

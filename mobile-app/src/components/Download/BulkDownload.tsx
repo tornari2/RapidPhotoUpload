@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDownload } from '../../hooks/useDownload';
+import { useToast } from '../../contexts/ToastContext';
 import type { Photo } from '../../types';
 
 interface BulkDownloadProps {
@@ -11,6 +12,7 @@ interface BulkDownloadProps {
 
 export const BulkDownload: React.FC<BulkDownloadProps> = ({ photos, onComplete }) => {
   const { downloadPhotos, isDownloading, progress, photoProgress, error } = useDownload();
+  const { showToast } = useToast();
   const [showProgress, setShowProgress] = useState(false);
 
   const handleDownload = async () => {
@@ -21,10 +23,17 @@ export const BulkDownload: React.FC<BulkDownloadProps> = ({ photos, onComplete }
       await downloadPhotos(photos, (completed, total) => {
         // Progress is handled by the hook
       });
-      Alert.alert('Success', `Downloaded ${progress.completed} of ${progress.total} photos`);
+      const successCount = progress.completed;
+      const failedCount = photos.length - successCount;
+      
+      if (failedCount === 0) {
+        showToast(`Successfully downloaded all ${successCount} photos`, 'success');
+      } else {
+        showToast(`Downloaded ${successCount} photos, ${failedCount} failed`, 'error');
+      }
       onComplete?.();
     } catch (err: any) {
-      Alert.alert('Download Failed', err.message || 'Failed to download photos');
+      showToast(err.message || 'Failed to download photos', 'error');
     } finally {
       setTimeout(() => {
         setShowProgress(false);

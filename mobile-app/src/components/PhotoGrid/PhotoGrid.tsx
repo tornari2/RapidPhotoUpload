@@ -27,7 +27,7 @@ interface PhotoGridProps {
   isRefreshing?: boolean;
   isLoadingMore?: boolean;
   hasMore?: boolean;
-  onRefresh?: () => void;
+  onRefresh?: () => void | Promise<void>;
   onLoadMore?: () => void;
 }
 
@@ -238,6 +238,9 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
           onDownload={onDownload}
           onTag={onTag}
           onDelete={onDelete}
+          onRefresh={async () => {
+            await refresh();
+          }}
         />
       )}
     </View>

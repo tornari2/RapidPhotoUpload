@@ -5,40 +5,37 @@ import {
   TouchableOpacity,
   Text,
   Alert,
-  Modal,
-  ScrollView,
   AppState,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ExpoImagePicker from 'expo-image-picker';
 import { PhotoGrid } from '../components/PhotoGrid/PhotoGrid';
 import { BulkDownload } from '../components/Download/BulkDownload';
 import { BulkTagModal } from '../components/Tagging/BulkTagModal';
 import { TagInput } from '../components/Tagging/TagInput';
-import { ImagePicker } from '../components/Upload/ImagePicker';
-import { BatchProgress } from '../components/Upload/BatchProgress';
-import { Button } from '../components/Button';
 import { photoService } from '../services/photoService';
 import { useAuth } from '../contexts/AuthContext';
 import { usePhotos } from '../hooks/usePhotos';
 import { useUpload } from '../hooks/useUpload';
+import { useDownload } from '../hooks/useDownload';
+import { useToast } from '../contexts/ToastContext';
 import type { Photo } from '../types';
 import type { PhotoFile } from '../types/upload';
 
 export default function GalleryScreen() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const { photos, isLoading, isRefreshing, isLoadingMore, hasMore, refresh, loadMore } = usePhotos();
-  const { uploadPhotos, uploadProgress, isUploading, error: uploadError } = useUpload();
+  const { uploadPhotos, isUploading } = useUpload();
+  const { downloadPhoto } = useDownload();
   const [selectedPhotos, setSelectedPhotos] = useState<Photo[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [taggingPhoto, setTaggingPhoto] = useState<Photo | null>(null);
   const [showBulkTagModal, setShowBulkTagModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedImages, setSelectedImages] = useState<PhotoFile[]>([]);
-  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Refresh photos when screen comes into focus (e.g., after uploading)
   useFocusEffect(
@@ -69,8 +66,14 @@ export default function GalleryScreen() {
     };
   }, [refresh]);
 
-  const handleDownload = (photo: Photo) => {
-    // Download handled by DownloadButton component
+  const handleDownload = async (photo: Photo) => {
+    try {
+      await downloadPhoto(photo);
+      showToast(`${photo.filename} downloaded successfully`, 'success');
+    } catch (error: any) {
+      console.error('Download failed:', error);
+      showToast(error.message || 'Failed to download photo', 'error');
+    }
   };
 
   const handleTag = (photo: Photo) => {
@@ -110,10 +113,38 @@ export default function GalleryScreen() {
     }
   };
 
-  const handleSelectAll = () => {
-    if (!isMultiSelectMode) return;
-    const newSelectAll = !isSelectAll;
-    setIsSelectAll(newSelectAll);
+  const handleDeleteAll = () => {
+    if (!user || photos.length === 0) return;
+
+    Alert.alert(
+      'Delete All Photos',
+      `Are you sure you want to delete ALL ${photos.length} photo${photos.length > 1 ? 's' : ''}? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsDeleting(true);
+              await photoService.deletePhotos(
+                photos.map((p) => p.id),
+                user.id
+              );
+              await refresh();
+            } catch (error: any) {
+              console.error('Failed to delete all photos:', error);
+              Alert.alert('Delete Failed', 'Failed to delete photos. Please try again.');
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleDelete = () => {
@@ -152,42 +183,89 @@ export default function GalleryScreen() {
     );
   };
 
-  const handleImagesSelected = (images: PhotoFile[]) => {
-    setSelectedImages(images);
-    // Clear validation error when new images are selected
-    if (validationError) {
-      setValidationError(null);
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const requestPermissions = async () => {
+    const { status } = await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Required',
+        'We need access to your photos to upload them.',
+        [{ text: 'OK' }]
+      );
+      return false;
     }
+    return true;
   };
 
-  const handleValidationError = (message: string) => {
-    setValidationError(message);
-  };
-
-  const handleUpload = async () => {
-    if (selectedImages.length === 0) return;
+  const handleCloudIconPress = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
 
     try {
-      await uploadPhotos(selectedImages, 3); // 3 concurrent uploads
-      setSelectedImages([]);
-      setValidationError(null);
-      setShowUploadModal(false);
-      await refresh();
-    } catch (err: any) {
-      console.error('Upload failed:', err);
-      // Show validation errors in the modal
-      const errorMessage = err.message || 'Upload failed. Please try again.';
-      if (errorMessage.includes('exceed') || errorMessage.includes('10MB')) {
-        setValidationError(errorMessage);
-      } else {
-        setValidationError(`Upload failed: ${errorMessage}`);
+      const result = await ExpoImagePicker.launchImageLibraryAsync({
+        mediaTypes: ExpoImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        quality: 0.8,
+        selectionLimit: 100,
+      });
+
+      if (!result.canceled && result.assets) {
+        const validImages: PhotoFile[] = [];
+        const tooLargeFiles: string[] = [];
+
+        result.assets.forEach((asset) => {
+          const fileSize = asset.fileSize || 0;
+          const filename = asset.fileName || `photo_${Date.now()}.jpg`;
+          
+          if (fileSize > MAX_FILE_SIZE) {
+            tooLargeFiles.push(`${filename} (${formatFileSize(fileSize)})`);
+          } else {
+            validImages.push({
+              uri: asset.uri,
+              filename,
+              fileSize,
+              type: asset.mimeType || 'image/jpeg',
+              width: asset.width,
+              height: asset.height,
+            });
+          }
+        });
+
+        // Show warning for files that are too large
+        if (tooLargeFiles.length > 0) {
+          const message = `The following ${tooLargeFiles.length} file${tooLargeFiles.length > 1 ? 's' : ''} exceed the 10MB limit and were not added:\n\n${tooLargeFiles.slice(0, 5).join('\n')}${tooLargeFiles.length > 5 ? `\n...and ${tooLargeFiles.length - 5} more` : ''}`;
+          Alert.alert('File Size Limit', message);
+        }
+
+        // Only upload valid images immediately
+        if (validImages.length > 0) {
+          // Start upload immediately
+          try {
+            await uploadPhotos(validImages, 3); // 3 concurrent uploads
+            await refresh();
+          } catch (err: any) {
+            console.error('Upload failed:', err);
+            const errorMessage = err.message || 'Upload failed. Please try again.';
+            Alert.alert('Upload Failed', errorMessage);
+          }
+        } else if (tooLargeFiles.length > 0) {
+          // If all files were too large, don't upload
+          return;
+        }
       }
+    } catch (error: any) {
+      console.error('Error picking images:', error);
+      Alert.alert('Error', 'Failed to pick images. Please try again.');
     }
   };
 
-  const handleClearSelection = () => {
-    setSelectedImages([]);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -195,12 +273,26 @@ export default function GalleryScreen() {
         <Text style={styles.title}>Gallery</Text>
         <View style={styles.headerActions}>
           {!isMultiSelectMode && (
-            <TouchableOpacity
-              onPress={() => setShowUploadModal(true)}
-              style={styles.headerButton}
-            >
-              <Ionicons name="cloud-upload-outline" size={24} color="#8B5CF6" />
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                onPress={handleCloudIconPress}
+                style={styles.headerButton}
+                disabled={isUploading}
+              >
+                <Ionicons name="cloud-upload-outline" size={24} color={isUploading ? '#666' : '#8B5CF6'} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleDeleteAll}
+                style={styles.headerButton}
+                disabled={isDeleting || photos.length === 0}
+              >
+                <Ionicons 
+                  name="trash-bin-outline" 
+                  size={24} 
+                  color={isDeleting || photos.length === 0 ? '#666' : '#EF4444'} 
+                />
+              </TouchableOpacity>
+            </>
           )}
           {isMultiSelectMode && (
             <>
@@ -231,28 +323,8 @@ export default function GalleryScreen() {
                   </TouchableOpacity>
                 </>
               )}
-              <TouchableOpacity
-                onPress={handleSelectAll}
-                style={styles.headerButton}
-              >
-                <Ionicons
-                  name={isSelectAll ? 'checkbox' : 'square-outline'}
-                  size={24}
-                  color={isSelectAll ? '#8B5CF6' : '#9CA3AF'}
-                />
-              </TouchableOpacity>
             </>
           )}
-          <TouchableOpacity
-            onPress={toggleMultiSelect}
-            style={styles.headerButton}
-          >
-            <Ionicons
-              name={isMultiSelectMode ? 'close-circle' : 'checkbox-outline'}
-              size={24}
-              color={isMultiSelectMode ? '#8B5CF6' : '#9CA3AF'}
-            />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -289,7 +361,8 @@ export default function GalleryScreen() {
           onClose={() => setTaggingPhoto(null)}
           onTagged={() => {
             setTaggingPhoto(null);
-            // Refresh photos if needed
+            // Don't refresh - tags are already updated on the backend
+            // and the modal closing will allow the UI to update naturally
           }}
         />
       )}
@@ -307,92 +380,12 @@ export default function GalleryScreen() {
             setShowBulkTagModal(false);
             setSelectedPhotos([]);
             setIsMultiSelectMode(false);
-            // Refresh photos if needed
+            // Don't refresh - tags are already updated on the backend
+            // and the modal closing will allow the UI to update naturally
           }}
         />
       )}
 
-      {showUploadModal && (
-        <Modal
-          visible={showUploadModal}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowUploadModal(false)}
-        >
-          <SafeAreaView style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Upload Photos</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowUploadModal(false);
-                    setSelectedImages([]);
-                  }}
-                  style={styles.modalCloseButton}
-                >
-                  <Ionicons name="close" size={24} color="#F3F4F6" />
-                </TouchableOpacity>
-              </View>
-
-              <ScrollView style={styles.modalScroll} contentContainerStyle={styles.modalScrollContent}>
-                <ImagePicker
-                  onImagesSelected={handleImagesSelected}
-                  onValidationError={handleValidationError}
-                  maxImages={100}
-                  disabled={isUploading}
-                />
-
-                {validationError && (
-                  <View style={styles.validationErrorContainer}>
-                    <View style={styles.validationErrorHeader}>
-                      <Ionicons name="warning-outline" size={20} color="#F59E0B" />
-                      <Text style={styles.validationErrorTitle}>File Size Warning</Text>
-                    </View>
-                    <Text style={styles.validationErrorText}>{validationError}</Text>
-                    <TouchableOpacity
-                      onPress={() => setValidationError(null)}
-                      style={styles.validationErrorDismiss}
-                    >
-                      <Text style={styles.validationErrorDismissText}>Dismiss</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {selectedImages.length > 0 && (
-                  <View style={styles.uploadActions}>
-                    <Button
-                      title={isUploading ? 'Uploading...' : `Upload ${selectedImages.length} Photo${selectedImages.length > 1 ? 's' : ''}`}
-                      onPress={handleUpload}
-                      variant="primary"
-                      size="large"
-                      disabled={isUploading}
-                      loading={isUploading}
-                      style={styles.uploadButton}
-                    />
-                    {!isUploading && (
-                      <TouchableOpacity onPress={handleClearSelection} style={styles.clearButton}>
-                        <Text style={styles.clearButtonText}>Clear Selection</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
-
-                {uploadProgress && (
-                  <View style={styles.progressContainer}>
-                    <BatchProgress progress={uploadProgress} />
-                  </View>
-                )}
-
-                {uploadError && (
-                  <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{uploadError}</Text>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </SafeAreaView>
-        </Modal>
-      )}
     </SafeAreaView>
   );
 }
@@ -435,103 +428,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     textAlign: 'center',
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  },
-  modalContent: {
-    flex: 1,
-    backgroundColor: '#000',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: 60,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1F2937',
-  },
-  modalTitle: {
-    color: '#F3F4F6',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  modalScroll: {
-    flex: 1,
-  },
-  modalScrollContent: {
-    padding: 16,
-  },
-  uploadActions: {
-    marginTop: 16,
-    gap: 12,
-  },
-  uploadButton: {
-    marginBottom: 8,
-  },
-  clearButton: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  clearButtonText: {
-    color: '#9CA3AF',
-    fontSize: 14,
-  },
-  progressContainer: {
-    marginTop: 16,
-  },
-  errorContainer: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#7F1D1D',
-    borderRadius: 8,
-  },
-  errorText: {
-    color: '#EF4444',
-    fontSize: 14,
-  },
-  validationErrorContainer: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#78350F',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-  },
-  validationErrorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  validationErrorTitle: {
-    color: '#F59E0B',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  validationErrorText: {
-    color: '#FCD34D',
-    fontSize: 12,
-    lineHeight: 18,
-    marginBottom: 8,
-  },
-  validationErrorDismiss: {
-    alignSelf: 'flex-end',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  validationErrorDismissText: {
-    color: '#F59E0B',
-    fontSize: 12,
-    fontWeight: '600',
   },
 });
 
