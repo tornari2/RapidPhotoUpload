@@ -45,13 +45,16 @@ export const TagInput: React.FC<TagInputProps> = ({
   };
 
   const handleSave = () => {
-    // Immediately notify parent to close everything (non-blocking)
-    onTagged();
-    
     // Fire and forget - tag photo in background without blocking
     tagPhoto(photo.id, selectedTags).catch((error: any) => {
       console.error('Failed to tag photo (background):', error);
     });
+    
+    // Use setTimeout to allow state to settle before closing
+    // This prevents blocking the UI thread
+    setTimeout(() => {
+      onTagged();
+    }, 50);
   };
 
   const existingTags = tags
