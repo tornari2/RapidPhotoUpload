@@ -1,0 +1,128 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    🚨 EMERGENCY STALLED UPLOADS CLEANUP 🚨                    ║
+║                     https://d1burddp911hjd.cloudfront.net/                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📊 PROBLEM: 100+ images stuck in "UPLOADING" status
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 QUICKEST FIX (5 minutes):
+───────────────────────────────────────────────────────────────────────────────
+
+1. Deploy the fix:
+   cd backend
+   ./deploy-cleanup-fix.sh
+
+2. Get your backend URL from AWS Console:
+   https://console.aws.amazon.com/elasticbeanstalk/
+
+3. Login to your app and get JWT token:
+   Open https://d1burddp911hjd.cloudfront.net/ in browser
+   Open DevTools Console (F12)
+   After logging in, get token:
+   > localStorage.getItem('token')
+   OR
+   > sessionStorage.getItem('token')
+
+4. Run cleanup:
+   Replace YOUR_BACKEND_URL and YOUR_JWT_TOKEN below:
+
+   curl -X DELETE "https://YOUR_BACKEND_URL/api/admin/stalled-uploads/delete-all" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔍 CHECK BEFORE CLEANUP:
+───────────────────────────────────────────────────────────────────────────────
+
+curl -X GET "https://YOUR_BACKEND_URL/api/admin/stalled-uploads/stats" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+Expected response:
+{
+  "stalledCount": 100+,
+  "thresholdMinutes": 10,
+  ...
+}
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🗑️ CLEANUP OPTIONS:
+───────────────────────────────────────────────────────────────────────────────
+
+Option A: Mark as FAILED (keeps records for audit):
+   curl -X POST "https://YOUR_BACKEND_URL/api/admin/stalled-uploads/cleanup" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+Option B: DELETE permanently (removes from DB & S3):
+   curl -X DELETE "https://YOUR_BACKEND_URL/api/admin/stalled-uploads/delete-all" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ VERIFY SUCCESS:
+───────────────────────────────────────────────────────────────────────────────
+
+curl -X GET "https://YOUR_BACKEND_URL/api/admin/stats" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+Expected: stalledCount should be 0
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ IMPORTANT SECURITY NOTE:
+───────────────────────────────────────────────────────────────────────────────
+
+The admin endpoints have NO authentication protection!
+After cleanup, you must either:
+  1. Add authentication to AdminController.java
+  2. Remove AdminController.java and redeploy
+  3. Block /api/admin/* via firewall/API Gateway
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔄 AUTOMATIC PREVENTION (Already Deployed):
+───────────────────────────────────────────────────────────────────────────────
+
+StalledUploadCleanupService runs every 5 minutes and automatically:
+  ✓ Detects uploads stuck for >10 minutes
+  ✓ Marks them as FAILED
+  ✓ Deletes partial S3 objects
+  ✓ Updates job statistics
+  ✓ Sends SSE notifications to clients
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📖 FULL GUIDE:
+───────────────────────────────────────────────────────────────────────────────
+
+See STALLED_UPLOADS_CLEANUP_GUIDE.md for:
+  • Detailed step-by-step instructions
+  • SQL scripts for direct database access
+  • S3 cleanup procedures
+  • Prevention strategies
+  • Troubleshooting
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 EXAMPLE COMMANDS (Replace placeholders):
+───────────────────────────────────────────────────────────────────────────────
+
+BACKEND_URL="https://your-app.elasticbeanstalk.com"
+JWT_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+# Check stats
+curl -X GET "$BACKEND_URL/api/admin/stalled-uploads/stats" \
+  -H "Authorization: Bearer $JWT_TOKEN"
+
+# Delete all stalled
+curl -X DELETE "$BACKEND_URL/api/admin/stalled-uploads/delete-all" \
+  -H "Authorization: Bearer $JWT_TOKEN"
+
+# Verify
+curl -X GET "$BACKEND_URL/api/admin/stats" \
+  -H "Authorization: Bearer $JWT_TOKEN"
+
+═══════════════════════════════════════════════════════════════════════════════
+
