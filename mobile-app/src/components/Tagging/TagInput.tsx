@@ -31,6 +31,7 @@ export const TagInput: React.FC<TagInputProps> = ({
   const [selectedTags, setSelectedTags] = useState<string[]>(
     photo.tags?.map((t) => t.name) || []
   );
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleAddTag = () => {
     const tagName = inputValue.trim();
@@ -45,14 +46,31 @@ export const TagInput: React.FC<TagInputProps> = ({
   };
 
   const handleSave = async () => {
+    if (isSaving) return; // Prevent double-tap
+    
     try {
-      await tagPhoto(photo.id, selectedTags);
-      // Close immediately without delay
-      onTagged();
+      setIsSaving(true);
+      
+      // Close modal immediately to prevent UI freeze
       onClose();
+      
+      // Tag photo in background (non-blocking)
+      tagPhoto(photo.id, selectedTags)
+        .then(() => {
+          // Success - notify parent after successful tagging
+          onTagged();
+        })
+        .catch((error: any) => {
+          console.error('Failed to tag photo:', error);
+          // Silently fail - could show a toast here in the future
+        })
+        .finally(() => {
+          setIsSaving(false);
+        });
     } catch (error: any) {
       console.error('Failed to tag photo:', error);
-      // You might want to show an alert here
+      setIsSaving(false);
+      onClose();
     }
   };
 
@@ -125,11 +143,21 @@ export const TagInput: React.FC<TagInputProps> = ({
           )}
 
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+            <TouchableOpacity 
+              style={styles.cancelButton} 
+              onPress={onClose}
+              disabled={isSaving}
+            >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save</Text>
+            <TouchableOpacity 
+              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} 
+              onPress={handleSave}
+              disabled={isSaving}
+            >
+              <Text style={styles.saveButtonText}>
+                {isSaving ? 'Saving...' : 'Save'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -249,6 +277,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#6B7280',
+    opacity: 0.5,
   },
   saveButtonText: {
     color: '#F3F4F6',
