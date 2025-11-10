@@ -14,8 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { photoService } from '../../services/photoService';
 import { TagInput } from '../Tagging/TagInput';
+import { Toast } from '../Toast/Toast';
 import { useDownload } from '../../hooks/useDownload';
-import { useToast } from '../../contexts/ToastContext';
 import type { Photo } from '../../types';
 
 const { width, height } = Dimensions.get('window');
@@ -40,12 +40,15 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   onRefresh,
 }) => {
   const { downloadPhoto } = useDownload();
-  const { showToast } = useToast();
   const initialIndex = photos.findIndex((p) => p.id === photo.id);
   const [currentIndex, setCurrentIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
   const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
   const [loadingUrls, setLoadingUrls] = useState<Set<string>>(new Set());
   const [showTagInput, setShowTagInput] = useState(false);
+  // Toast state for download notifications
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const flatListRef = useRef<FlatList>(null);
   const loadedUrlsRef = useRef<Set<string>>(new Set());
   // Refs to track current state values without causing re-renders
@@ -249,12 +252,18 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   const handleDownload = async () => {
     try {
       await downloadPhoto(currentPhoto);
-      showToast(`${currentPhoto.filename} downloaded successfully`, 'success');
+      // Show success toast
+      setToastMessage(`${currentPhoto.filename} downloaded successfully`);
+      setToastType('success');
+      setToastVisible(true);
       // Call the optional onDownload callback if provided
       onDownload?.(currentPhoto);
     } catch (error: any) {
       console.error('Download failed:', error);
-      showToast(error.message || 'Failed to download photo', 'error');
+      // Show error toast
+      setToastMessage(error.message || 'Failed to download photo');
+      setToastType('error');
+      setToastVisible(true);
     }
   };
 
@@ -403,6 +412,15 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             }}
           />
         )}
+
+        {/* Toast notification inside modal for downloads */}
+        <Toast
+          visible={toastVisible}
+          message={toastMessage}
+          type={toastType}
+          duration={3000}
+          onHide={() => setToastVisible(false)}
+        />
       </SafeAreaView>
     </Modal>
   );
