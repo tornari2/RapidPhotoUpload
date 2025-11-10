@@ -406,9 +406,9 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             onClose={() => setShowTagInput(false)}
             onTagged={() => {
               setShowTagInput(false);
-              // Don't refresh - tags are already updated on the backend
-              // and the modal closing will allow the UI to update naturally
               onTag?.(currentPhoto);
+              // Close the PhotoViewer to return to gallery after tagging
+              onClose();
             }}
           />
         )}
