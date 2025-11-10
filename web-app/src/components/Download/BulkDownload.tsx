@@ -20,7 +20,7 @@ export function BulkDownload({ photos, onComplete, className = '' }: BulkDownloa
 
     setShowProgress(true);
     try {
-      await downloadPhotos(photos, (completed, total) => {
+      await downloadPhotos(photos, (_completed, _total) => {
         // Progress is handled by the hook
       });
       onComplete?.();

@@ -15,6 +15,7 @@
     <groupId>com.rapidphoto</groupId>
     <artifactId>rapid-photo-upload</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <name>RapidPhotoUpload</name>
     <description>High-performance asynchronous photo upload system</description>
     
@@ -26,6 +27,7 @@
         <flyway.version>10.7.1</flyway.version>
         <jwt.version>0.12.3</jwt.version>
         <lombok.version>1.18.30</lombok.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
     <dependencies>

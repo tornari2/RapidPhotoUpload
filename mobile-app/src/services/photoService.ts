@@ -114,5 +114,52 @@ export const photoService = {
       );
     }
   },
+
+  /**
+   * Get all photo IDs for a user (across all pages)
+   */
+  async getAllPhotoIds(userId: string): Promise<string[]> {
+    try {
+      const allPhotoIds: string[] = [];
+      let page = 0;
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await this.getUserPhotos(userId, page, 100); // Use larger page size for efficiency
+        allPhotoIds.push(...response.content.map(photo => photo.id));
+        hasMore = !response.last;
+        page++;
+      }
+
+      return allPhotoIds;
+    } catch (error: any) {
+      console.error('Failed to get all photo IDs:', error);
+      throw new Error(
+        error.response?.data?.message || 'Failed to get photo IDs'
+      );
+    }
+  },
+
+  /**
+   * Delete ALL photos for a user (fetches all pages)
+   */
+  async deleteAllPhotos(userId: string): Promise<void> {
+    try {
+      // First, get all photo IDs across all pages
+      const allPhotoIds = await this.getAllPhotoIds(userId);
+      
+      if (allPhotoIds.length === 0) {
+        return; // Nothing to delete
+      }
+
+      // Then delete them all
+      await this.deletePhotos(allPhotoIds, userId);
+    } catch (error: any) {
+      console.error('Failed to delete all photos:', error);
+      throw new Error(
+        error.response?.data?.message || 'Failed to delete all photos'
+      );
+    }
+  },
 };
 

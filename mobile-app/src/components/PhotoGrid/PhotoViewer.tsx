@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { photoService } from '../../services/photoService';
-import { TagInput } from '../Tagging/TagInput';
 import { Toast } from '../Toast/Toast';
 import { useDownload } from '../../hooks/useDownload';
 import type { Photo } from '../../types';
@@ -25,7 +24,6 @@ interface PhotoViewerProps {
   photos: Photo[];
   onClose: () => void;
   onDownload?: (photo: Photo) => void;
-  onTag?: (photo: Photo) => void;
   onDelete?: (photo: Photo) => void;
   onRefresh?: () => Promise<void>;
 }
@@ -35,7 +33,6 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   photos,
   onClose,
   onDownload,
-  onTag,
   onDelete,
   onRefresh,
 }) => {
@@ -44,7 +41,6 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
   const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
   const [loadingUrls, setLoadingUrls] = useState<Set<string>>(new Set());
-  const [showTagInput, setShowTagInput] = useState(false);
   // Toast state for download notifications
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -69,8 +65,6 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       const index = viewableItems[0].index;
       if (index !== null && index !== currentIndex) {
         setCurrentIndex(index);
-        // Close tag input when photo changes
-        setShowTagInput(false);
       }
     }
   }).current;
@@ -357,26 +351,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
           </View>
         )}
 
-        {currentPhoto.tags && currentPhoto.tags.length > 0 && (
-          <View style={styles.tagsContainer}>
-            <Text style={styles.tagsLabel}>Tags:</Text>
-            <Text style={styles.tagsText}>
-              {currentPhoto.tags.map((tag) => tag.name).join(', ')}
-            </Text>
-          </View>
-        )}
-
         <View style={styles.actionBar}>
-          {onTag && (
-            <TouchableOpacity
-              onPress={() => setShowTagInput(true)}
-              style={styles.actionButton}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="pricetag-outline" size={28} color="#F3F4F6" />
-              <Text style={styles.actionButtonLabel}>Tag</Text>
-            </TouchableOpacity>
-          )}
           {onDownload && (
             <TouchableOpacity
               onPress={handleDownload}
@@ -398,22 +373,6 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             </TouchableOpacity>
           )}
         </View>
-
-        {showTagInput && (
-          <TagInput
-            photo={currentPhoto}
-            visible={showTagInput}
-            onClose={() => setShowTagInput(false)}
-            onTagged={() => {
-              // Close TagInput modal first
-              setShowTagInput(false);
-              // Notify parent component if needed
-              onTag?.(currentPhoto);
-              // Close the PhotoViewer to return to gallery after successful tagging
-              onClose();
-            }}
-          />
-        )}
 
         {/* Toast notification inside modal for downloads */}
         <Toast
@@ -486,19 +445,6 @@ const styles = StyleSheet.create({
     color: '#F3F4F6',
     fontSize: 16,
     fontWeight: '600',
-  },
-  tagsContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  tagsLabel: {
-    color: '#9CA3AF',
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  tagsText: {
-    color: '#F3F4F6',
-    fontSize: 14,
   },
   actionBar: {
     flexDirection: 'row',

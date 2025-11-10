@@ -13,8 +13,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ExpoImagePicker from 'expo-image-picker';
 import { PhotoGrid } from '../components/PhotoGrid/PhotoGrid';
 import { BulkDownload } from '../components/Download/BulkDownload';
-import { BulkTagModal } from '../components/Tagging/BulkTagModal';
-import { TagInput } from '../components/Tagging/TagInput';
 import { photoService } from '../services/photoService';
 import { useAuth } from '../contexts/AuthContext';
 import { usePhotos } from '../hooks/usePhotos';
@@ -33,8 +31,6 @@ export default function GalleryScreen() {
   const [selectedPhotos, setSelectedPhotos] = useState<Photo[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [isSelectAll, setIsSelectAll] = useState(false);
-  const [taggingPhoto, setTaggingPhoto] = useState<Photo | null>(null);
-  const [showBulkTagModal, setShowBulkTagModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Refresh photos when screen comes into focus (e.g., after uploading)
@@ -76,10 +72,6 @@ export default function GalleryScreen() {
     }
   };
 
-  const handleTag = (photo: Photo) => {
-    setTaggingPhoto(photo);
-  };
-
   const handleDeletePhoto = async (photo: Photo) => {
     if (!user) return;
 
@@ -95,12 +87,6 @@ export default function GalleryScreen() {
     setSelectedPhotos(selected);
   };
 
-  const handleBulkTag = () => {
-    if (selectedPhotos.length > 0) {
-      setShowBulkTagModal(true);
-    }
-  };
-
   const handleBulkDownload = () => {
     // Bulk download handled by BulkDownload component
   };
@@ -113,38 +99,71 @@ export default function GalleryScreen() {
     }
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
     if (!user || photos.length === 0) return;
 
-    Alert.alert(
-      'Delete All Photos',
-      `Are you sure you want to delete ALL ${photos.length} photo${photos.length > 1 ? 's' : ''}? This action cannot be undone.`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete All',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsDeleting(true);
-              await photoService.deletePhotos(
-                photos.map((p) => p.id),
-                user.id
-              );
-              await refresh();
-            } catch (error: any) {
-              console.error('Failed to delete all photos:', error);
-              Alert.alert('Delete Failed', 'Failed to delete photos. Please try again.');
-            } finally {
-              setIsDeleting(false);
-            }
+    // Get the total count of photos for accurate confirmation message
+    try {
+      const allPhotoIds = await photoService.getAllPhotoIds(user.id);
+      const totalCount = allPhotoIds.length;
+
+      Alert.alert(
+        'Delete All Photos',
+        `Are you sure you want to delete ALL ${totalCount} photo${totalCount > 1 ? 's' : ''}? This action cannot be undone.`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
           },
-        },
-      ]
-    );
+          {
+            text: 'Delete All',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                setIsDeleting(true);
+                // Use the new deleteAllPhotos method that fetches ALL photos across all pages
+                await photoService.deleteAllPhotos(user.id);
+                await refresh();
+              } catch (error: any) {
+                console.error('Failed to delete all photos:', error);
+                Alert.alert('Delete Failed', 'Failed to delete photos. Please try again.');
+              } finally {
+                setIsDeleting(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error('Failed to get photo count:', error);
+      // Fallback to showing current loaded count if we can't fetch all IDs
+      Alert.alert(
+        'Delete All Photos',
+        `Are you sure you want to delete ALL photos? This action cannot be undone.`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete All',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                setIsDeleting(true);
+                await photoService.deleteAllPhotos(user.id);
+                await refresh();
+              } catch (error: any) {
+                console.error('Failed to delete all photos:', error);
+                Alert.alert('Delete Failed', 'Failed to delete photos. Please try again.');
+              } finally {
+                setIsDeleting(false);
+              }
+            },
+          },
+        ]
+      );
+    }
   };
 
   const handleDelete = () => {
@@ -299,12 +318,6 @@ export default function GalleryScreen() {
               {selectedPhotos.length > 0 && (
                 <>
                   <TouchableOpacity
-                    onPress={handleBulkTag}
-                    style={styles.headerButton}
-                  >
-                    <Ionicons name="pricetag-outline" size={24} color="#8B5CF6" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
                     onPress={handleBulkDownload}
                     style={styles.headerButton}
                   >
@@ -339,7 +352,6 @@ export default function GalleryScreen() {
 
       <PhotoGrid
         onDownload={handleDownload}
-        onTag={handleTag}
         onDelete={handleDeletePhoto}
         multiSelect={isMultiSelectMode}
         onSelectionChange={handleSelectionChange}
@@ -353,38 +365,6 @@ export default function GalleryScreen() {
         onRefresh={refresh}
         onLoadMore={loadMore}
       />
-
-      {taggingPhoto && (
-        <TagInput
-          photo={taggingPhoto}
-          visible={!!taggingPhoto}
-          onClose={() => setTaggingPhoto(null)}
-          onTagged={() => {
-            setTaggingPhoto(null);
-            // Don't refresh - tags are already updated on the backend
-            // and the modal closing will allow the UI to update naturally
-          }}
-        />
-      )}
-
-      {showBulkTagModal && (
-        <BulkTagModal
-          photos={selectedPhotos}
-          visible={showBulkTagModal}
-          onClose={() => {
-            setShowBulkTagModal(false);
-            setSelectedPhotos([]);
-            setIsMultiSelectMode(false);
-          }}
-          onTagged={() => {
-            setShowBulkTagModal(false);
-            setSelectedPhotos([]);
-            setIsMultiSelectMode(false);
-            // Don't refresh - tags are already updated on the backend
-            // and the modal closing will allow the UI to update naturally
-          }}
-        />
-      )}
 
     </SafeAreaView>
   );

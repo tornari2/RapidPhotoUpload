@@ -10,7 +10,6 @@ export const store = configureStore({
     // Add your reducers here when you create them:
     // photos: photosReducer,
     // upload: uploadReducer,
-    // tags: tagsReducer,
   },
 });
 

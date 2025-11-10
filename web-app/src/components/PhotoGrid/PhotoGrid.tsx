@@ -35,7 +35,6 @@ export function PhotoGrid({
   onDelete,
   onTag,
   selectedPhotos,
-  onToggleSelection,
   onLoadedCountChange,
   downloadProgress,
   uploadProgress,

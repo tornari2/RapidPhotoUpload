@@ -1,6 +1,6 @@
 import { photoService } from './photoService';
 import type { Photo } from '../types/photo';
-import { retryWithBackoff, withTimeout } from '../utils/retryUtils';
+import { retryWithBackoff } from '../utils/retryUtils';
 
 export interface DownloadProgress {
   photoId: string;
@@ -35,7 +35,7 @@ export const downloadService = {
           initialDelayMs: 1000,
           maxDelayMs: 5000,
           timeoutMs: 60000, // 60 seconds for large images
-          shouldRetry: (error) => {
+          shouldRetry: () => {
             // Retry on network errors and server errors
             return true;
           },

@@ -15,7 +15,6 @@ import type { Photo } from '../../types';
 
 interface PhotoGridProps {
   onDownload?: (photo: Photo) => void;
-  onTag?: (photo: Photo) => void;
   onDelete?: (photo: Photo) => void;
   multiSelect?: boolean;
   onSelectionChange?: (selectedPhotos: Photo[]) => void;
@@ -33,7 +32,6 @@ interface PhotoGridProps {
 
 export const PhotoGrid: React.FC<PhotoGridProps> = ({
   onDownload,
-  onTag,
   onDelete,
   multiSelect = false,
   onSelectionChange,
@@ -175,13 +173,12 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
         photo={item}
         onPress={handlePress}
         onDownload={onDownload}
-        onTag={onTag}
         onDelete={onDelete}
         isSelected={selectedPhotos.has(item.id)}
         onSelect={handleSelect}
       />
     ),
-    [handlePress, handleSelect, onDownload, onTag, onDelete, selectedPhotos]
+    [handlePress, handleSelect, onDownload, onDelete, selectedPhotos]
   );
 
   const renderFooter = useCallback(() => {
@@ -236,7 +233,6 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
           photos={photos}
           onClose={() => setViewingPhoto(null)}
           onDownload={onDownload}
-          onTag={onTag}
           onDelete={onDelete}
           onRefresh={async () => {
             await refresh();

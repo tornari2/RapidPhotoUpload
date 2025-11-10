@@ -1,0 +1,41 @@
+# .ebignore
+# Files to exclude from Elastic Beanstalk deployment
+
+# Maven
+target/
+!target/*.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build
+*.class
+
+# Test
+src/test/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+README.md
+
+# Scripts (except those needed for deployment)
+*.sh
+!build-for-eb.sh
+!deploy.sh
+

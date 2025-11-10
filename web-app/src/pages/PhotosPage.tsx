@@ -114,18 +114,6 @@ export default function PhotosPage() {
     setSelectedPhotos(new Set());
   };
 
-  const handleToggleSelection = (photoId: string) => {
-    setSelectedPhotos((prev) => {
-      const next = new Set(prev);
-      if (next.has(photoId)) {
-        next.delete(photoId);
-      } else {
-        next.add(photoId);
-      }
-      return next;
-    });
-  };
-
   const handleSelectAll = () => {
     if (selectedPhotos.size === photos.length) {
       setSelectedPhotos(new Set());

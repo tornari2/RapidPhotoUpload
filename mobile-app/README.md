@@ -7,7 +7,6 @@ React Native mobile application for RapidPhotoUpload, built with Expo.
 - **Authentication**: JWT-based authentication with secure token storage
 - **Photo Upload**: Upload up to 100 photos concurrently with real-time progress
 - **Photo Gallery**: View photos in an infinite-scroll grid with multi-select
-- **Tagging**: Add tags to photos individually or in bulk
 - **Download**: Save photos to device storage
 - **Dark Theme**: Modern UI with gradient buttons
 
@@ -141,7 +140,6 @@ This mobile app uses the same REST API as the web application:
 - Authentication: `/api/auth/*`
 - Photos: `/api/photos/*`
 - Upload: `/api/upload/*`
-- Tags: `/api/tags/*`
 - Download: `/api/download/*`
 
 All API requests are automatically configured with JWT authentication via request interceptors.
@@ -173,7 +171,6 @@ See the following tasks for implementing features:
 - **Task 27**: Mobile Authentication System
 - **Task 20**: Mobile Upload Feature
 - **Task 21**: Mobile Photo Grid
-- **Task 22**: Mobile Tagging System
 - **Task 23**: Mobile Download Feature
 
 ## License

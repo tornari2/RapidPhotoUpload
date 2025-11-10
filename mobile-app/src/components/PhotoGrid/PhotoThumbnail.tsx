@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TagDisplay } from '../Tagging/TagDisplay';
 import { photoService } from '../../services/photoService';
 import type { Photo } from '../../types';
 
@@ -16,7 +15,6 @@ interface PhotoThumbnailProps {
   photo: Photo;
   onPress: (photo: Photo) => void;
   onDownload?: (photo: Photo) => void;
-  onTag?: (photo: Photo) => void;
   onDelete?: (photo: Photo) => void;
   isSelected?: boolean;
   onSelect?: (photo: Photo) => void;
@@ -28,7 +26,6 @@ export const PhotoThumbnail = memo<PhotoThumbnailProps>(
     photo,
     onPress,
     onDownload,
-    onTag,
     onDelete,
     isSelected = false,
     onSelect,
@@ -166,12 +163,6 @@ export const PhotoThumbnail = memo<PhotoThumbnailProps>(
             </View>
           </View>
         )}
-
-        {photo.tags && photo.tags.length > 0 && (
-          <View style={styles.tagsContainer}>
-            <TagDisplay tags={photo.tags} maxVisible={2} />
-          </View>
-        )}
       </TouchableOpacity>
     );
   }
@@ -226,17 +217,6 @@ const styles = StyleSheet.create({
   downloadProgressFill: {
     height: '100%',
     backgroundColor: '#8B5CF6',
-  },
-  tagsContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
   },
   uploadingText: {
     color: '#9CA3AF',

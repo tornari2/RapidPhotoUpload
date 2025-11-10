@@ -429,8 +429,6 @@ export default function GalleryPage() {
     
     // Optimistically remove the photo from local state immediately
     const previousPhotos = loadedPhotos;
-    const previousUploadingPhotos = uploadingPhotos;
-    const previousSelectedPhotos = selectedPhotos;
     
     // Remove from loaded photos optimistically
     setLoadedCount(prev => Math.max(0, prev - 1));

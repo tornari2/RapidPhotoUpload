@@ -18,13 +18,6 @@ export interface Photo {
   retryCount?: number;
   createdAt: string;
   completedAt?: string;
-  tags?: Tag[];
-}
-
-// Tag types
-export interface Tag {
-  id: string;
-  name: string;
 }
 
 // Upload types
