@@ -1,0 +1,50 @@
+-------------------------------------------------------------------------------
+Test set: com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 2.902 s <<< FAILURE! -- in com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest
+com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_MultiplePhotos_Success -- Time elapsed: 0.127 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<400>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_MultiplePhotos_Success(CompleteUploadFlowIntegrationTest.java:253)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_PartialFailure -- Time elapsed: 0.012 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<400>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_PartialFailure(CompleteUploadFlowIntegrationTest.java:334)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_DataPersistenceVerification -- Time elapsed: 0.010 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<400>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_DataPersistenceVerification(CompleteUploadFlowIntegrationTest.java:464)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_SinglePhoto_Success -- Time elapsed: 0.008 s <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.photos[0].uploadUrl"
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:37)
+	at org.springframework.test.util.AssertionErrors.assertTrue(AssertionErrors.java:70)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertExistsAndReturn(JsonPathExpectationsHelper.java:328)
+	at org.springframework.test.util.JsonPathExpectationsHelper.exists(JsonPathExpectationsHelper.java:190)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$exists$3(JsonPathResultMatchers.java:123)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.rapidphoto.features.upload_photo.CompleteUploadFlowIntegrationTest.testCompleteUploadFlow_SinglePhoto_Success(CompleteUploadFlowIntegrationTest.java:114)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

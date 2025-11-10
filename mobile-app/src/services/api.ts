@@ -4,30 +4,29 @@ import { Platform } from 'react-native';
 
 // Determine the correct API base URL based on the environment
 const getApiBaseUrl = (): string => {
+  // Always use production backend for mobile app (no local backend running)
+  return 'http://rapid-photo-upload-env.eba-mhsctwie.us-east-2.elasticbeanstalk.com';
+  
+  // Uncomment below to use local backend in development:
+  /*
   if (!__DEV__) {
-    return 'https://d21zoepcm3h6ut.cloudfront.net/api'; // Production API URL
+    return 'http://rapid-photo-upload-env.eba-mhsctwie.us-east-2.elasticbeanstalk.com';
   }
 
   // Development mode - detect platform and use appropriate URL
   const isIOS = Platform.OS === 'ios';
   const isAndroid = Platform.OS === 'android';
   
-  // Your computer's local IP address - update this if it changes
-  // Find it by running: ifconfig | grep "inet " | grep -v 127.0.0.1
   const COMPUTER_IP = '10.10.0.209';
   
   if (isIOS) {
-    // iOS Simulator: Use localhost (simulator can access host machine's localhost)
-    // For physical iOS device, change this to: `http://${COMPUTER_IP}:8080`
     return 'http://localhost:8080';
   } else if (isAndroid) {
-    // Android Emulator - use special IP that maps to host machine
-    // For physical Android device, change this to your computer's IP: `http://${COMPUTER_IP}:8080`
     return 'http://10.0.2.2:8080';
   } else {
-    // Fallback for other platforms
     return `http://${COMPUTER_IP}:8080`;
   }
+  */
 };
 
 // API configuration

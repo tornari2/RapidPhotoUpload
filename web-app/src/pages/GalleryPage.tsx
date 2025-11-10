@@ -50,37 +50,9 @@ export default function GalleryPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
-  const stalledUploadLastUpdateRef = useRef<number>(Date.now());
   const consecutiveErrorCountRef = useRef<number>(0);
   const lastRefreshTimeRef = useRef<number>(Date.now());
   const lastErrorRef = useRef<Error | null>(null);
-  const handleClearStalledUploads = useCallback(() => {
-    setUploadingPhotos(new Map());
-    setSelectedPhotos(new Set());
-    resetUpload();
-    refresh();
-  }, [refresh, resetUpload]);
-
-  useEffect(() => {
-    if (uploadProgress) {
-      stalledUploadLastUpdateRef.current = Date.now();
-    }
-  }, [uploadProgress]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const hasUploadingPhotos = uploadingPhotos.size > 0;
-      const jobActive = uploadProgress?.status === 'uploading';
-      const lastUpdateAge = Date.now() - stalledUploadLastUpdateRef.current;
-      const isStale = lastUpdateAge > 60000; // 60 seconds without progress
-
-      if (hasUploadingPhotos && (!jobActive || isStale)) {
-        handleClearStalledUploads();
-      }
-    }, 15000); // check every 15 seconds
-
-    return () => clearInterval(interval);
-  }, [uploadingPhotos, uploadProgress, handleClearStalledUploads]);
 
   // Clear uploading photos when all photos are deleted
   useEffect(() => {
@@ -666,7 +638,6 @@ export default function GalleryPage() {
 
 
   const selectedPhotosList = allPhotos.filter((p) => selectedPhotos.has(p.id));
-  const hasStalledUploads = uploadingPhotos.size > 0;
 
   if (!user) {
     return (
@@ -695,14 +666,6 @@ export default function GalleryPage() {
           </div>
           
           <div className="flex items-center gap-3" id="gallery-header-actions">
-            {hasStalledUploads && (
-              <button
-                onClick={handleClearStalledUploads}
-                className="px-4 py-2 text-sm font-medium text-black bg-yellow-400 border border-yellow-300 rounded-md hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
-              >
-                Clear Stalled Uploads
-              </button>
-            )}
             <HeaderUploadButton />
             {selectedPhotos.size > 0 && (
               <>

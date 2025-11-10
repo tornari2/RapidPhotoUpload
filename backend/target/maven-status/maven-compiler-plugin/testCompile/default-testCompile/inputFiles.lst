@@ -8,6 +8,7 @@
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/infrastructure/config/AsyncConfigTest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/infrastructure/security/JwtTokenProviderTest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/features/tag_photo/TagPhotoIntegrationTest.java
+/Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/features/upload_photo/CompleteUploadFlowIntegrationTest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/features/download_photo/DownloadPhotoIntegrationTest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/infrastructure/s3/S3ServiceTest.java
 /Users/michaeltornaritis/Desktop/WK4_RapidPhotoUpload/backend/src/test/java/com/rapidphoto/features/upload_photo/CreateUploadJobIntegrationTest.java
