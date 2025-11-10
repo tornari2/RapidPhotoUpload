@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { photoService } from '../../services/photoService';
 import { TagInput } from '../Tagging/TagInput';
+import { useDownload } from '../../hooks/useDownload';
+import { useToast } from '../../contexts/ToastContext';
 import type { Photo } from '../../types';
 
 const { width, height } = Dimensions.get('window');
@@ -37,6 +39,8 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
   onDelete,
   onRefresh,
 }) => {
+  const { downloadPhoto } = useDownload();
+  const { showToast } = useToast();
   const initialIndex = photos.findIndex((p) => p.id === photo.id);
   const [currentIndex, setCurrentIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
   const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
@@ -242,6 +246,18 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
     }
   };
 
+  const handleDownload = async () => {
+    try {
+      await downloadPhoto(currentPhoto);
+      showToast(`${currentPhoto.filename} downloaded successfully`, 'success');
+      // Call the optional onDownload callback if provided
+      onDownload?.(currentPhoto);
+    } catch (error: any) {
+      console.error('Download failed:', error);
+      showToast(error.message || 'Failed to download photo', 'error');
+    }
+  };
+
   return (
     <Modal visible={true} transparent={true} animationType="fade" onRequestClose={onClose}>
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -354,7 +370,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
           )}
           {onDownload && (
             <TouchableOpacity
-              onPress={() => onDownload(currentPhoto)}
+              onPress={handleDownload}
               style={styles.actionButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >

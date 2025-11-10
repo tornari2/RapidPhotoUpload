@@ -36,11 +36,12 @@ export function useTags() {
     }
     try {
       await tagService.tagPhoto(photoId, user.id, tagNames);
-      await loadTags(); // Refresh tags list
+      // Don't refresh tags automatically - let the UI handle it when needed
+      // await loadTags(); // Removed to prevent performance issues
     } catch (err: any) {
       throw new Error(err.message || 'Failed to tag photo');
     }
-  }, [loadTags, user?.id]);
+  }, [user?.id]);
 
   const bulkTagPhotos = useCallback(async (photoIds: string[], tagNames: string[]) => {
     if (!user?.id) {
@@ -48,20 +49,22 @@ export function useTags() {
     }
     try {
       await tagService.bulkTagPhotos(photoIds, user.id, tagNames);
-      await loadTags(); // Refresh tags list
+      // Don't refresh tags automatically - let the UI handle it when needed
+      // await loadTags(); // Removed to prevent performance issues
     } catch (err: any) {
       throw new Error(err.message || 'Failed to tag photos');
     }
-  }, [loadTags, user?.id]);
+  }, [user?.id]);
 
   const removeTags = useCallback(async (photoId: string, tagIds: string[]) => {
     try {
       await tagService.removeTags(photoId, tagIds);
-      await loadTags(); // Refresh tags list
+      // Don't refresh tags automatically - let the UI handle it when needed
+      // await loadTags(); // Removed to prevent performance issues
     } catch (err: any) {
       throw new Error(err.message || 'Failed to remove tags');
     }
-  }, [loadTags]);
+  }, []);
 
   useEffect(() => {
     loadTags();

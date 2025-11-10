@@ -69,10 +69,10 @@ export default function GalleryScreen() {
   const handleDownload = async (photo: Photo) => {
     try {
       await downloadPhoto(photo);
-      showToast(`${photo.filename} downloaded successfully`, 'success');
+      // Toast notification is now handled in PhotoViewer
     } catch (error: any) {
       console.error('Download failed:', error);
-      showToast(error.message || 'Failed to download photo', 'error');
+      // Error toast is now handled in PhotoViewer
     }
   };
 
