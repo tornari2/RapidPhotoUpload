@@ -31,7 +31,6 @@ export const TagInput: React.FC<TagInputProps> = ({
   const [selectedTags, setSelectedTags] = useState<string[]>(
     photo.tags?.map((t) => t.name) || []
   );
-  const [isSaving, setIsSaving] = useState(false);
 
   const handleAddTag = () => {
     const tagName = inputValue.trim();
@@ -45,22 +44,14 @@ export const TagInput: React.FC<TagInputProps> = ({
     setSelectedTags(selectedTags.filter((t) => t !== tagName));
   };
 
-  const handleSave = async () => {
-    if (isSaving) return; // Prevent double-tap
+  const handleSave = () => {
+    // Immediately notify parent to close everything (non-blocking)
+    onTagged();
     
-    setIsSaving(true);
-    
-    try {
-      // Tag photo (wait for it to complete)
-      await tagPhoto(photo.id, selectedTags);
-      
-      // Success - notify parent (parent will handle closing)
-      onTagged();
-    } catch (error: any) {
-      console.error('Failed to tag photo:', error);
-      // Close modal on error
-      onClose();
-    }
+    // Fire and forget - tag photo in background without blocking
+    tagPhoto(photo.id, selectedTags).catch((error: any) => {
+      console.error('Failed to tag photo (background):', error);
+    });
   };
 
   const existingTags = tags
@@ -135,18 +126,14 @@ export const TagInput: React.FC<TagInputProps> = ({
             <TouchableOpacity 
               style={styles.cancelButton} 
               onPress={onClose}
-              disabled={isSaving}
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} 
+              style={styles.saveButton} 
               onPress={handleSave}
-              disabled={isSaving}
             >
-              <Text style={styles.saveButtonText}>
-                {isSaving ? 'Saving...' : 'Save'}
-              </Text>
+              <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -266,10 +253,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-  },
-  saveButtonDisabled: {
-    backgroundColor: '#6B7280',
-    opacity: 0.5,
   },
   saveButtonText: {
     color: '#F3F4F6',
