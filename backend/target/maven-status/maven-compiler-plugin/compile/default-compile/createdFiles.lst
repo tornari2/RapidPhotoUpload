@@ -1,6 +1,7 @@
 com/rapidphoto/domain/Photo.class
 com/rapidphoto/features/get_photos/GetUserPhotosQuery.class
 com/rapidphoto/domain/UploadJobStatus.class
+com/rapidphoto/features/get_photos/dto/PhotoResponse$TagDto$TagDtoBuilder.class
 com/rapidphoto/features/tag_photo/BulkTagPhotosCommand$BulkTagPhotosCommandBuilder.class
 com/rapidphoto/features/upload_photo/dto/CreateUploadJobRequest$CreateUploadJobRequestBuilder.class
 com/rapidphoto/features/auth/dto/LoginResponse.class
@@ -17,6 +18,7 @@ com/rapidphoto/features/auth/dto/LoginRequest.class
 com/rapidphoto/features/upload_photo/CreateUploadJobCommand$PhotoInfo.class
 com/rapidphoto/features/upload_photo/CompletePhotoUploadCommand$CompletePhotoUploadCommandBuilder.class
 com/rapidphoto/domain/Photo$PhotoBuilder.class
+com/rapidphoto/features/get_photos/dto/PhotoResponse$TagDto.class
 com/rapidphoto/domain/UploadEvent$UploadEventBuilder.class
 com/rapidphoto/features/upload_photo/PhotoController$SuccessResponse.class
 com/rapidphoto/features/retry_upload/dto/RetryUploadResponse$RetryUploadResponseBuilder.class
