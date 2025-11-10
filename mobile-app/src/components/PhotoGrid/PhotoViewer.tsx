@@ -405,9 +405,11 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             visible={showTagInput}
             onClose={() => setShowTagInput(false)}
             onTagged={() => {
+              // Close TagInput modal first
               setShowTagInput(false);
+              // Notify parent component if needed
               onTag?.(currentPhoto);
-              // Close the PhotoViewer to return to gallery after tagging
+              // Close the PhotoViewer to return to gallery after successful tagging
               onClose();
             }}
           />

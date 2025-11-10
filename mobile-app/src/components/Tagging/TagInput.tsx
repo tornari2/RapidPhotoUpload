@@ -48,28 +48,17 @@ export const TagInput: React.FC<TagInputProps> = ({
   const handleSave = async () => {
     if (isSaving) return; // Prevent double-tap
     
+    setIsSaving(true);
+    
     try {
-      setIsSaving(true);
+      // Tag photo (wait for it to complete)
+      await tagPhoto(photo.id, selectedTags);
       
-      // Close modal immediately to prevent UI freeze
-      onClose();
-      
-      // Tag photo in background (non-blocking)
-      tagPhoto(photo.id, selectedTags)
-        .then(() => {
-          // Success - notify parent after successful tagging
-          onTagged();
-        })
-        .catch((error: any) => {
-          console.error('Failed to tag photo:', error);
-          // Silently fail - could show a toast here in the future
-        })
-        .finally(() => {
-          setIsSaving(false);
-        });
+      // Success - notify parent (parent will handle closing)
+      onTagged();
     } catch (error: any) {
       console.error('Failed to tag photo:', error);
-      setIsSaving(false);
+      // Close modal on error
       onClose();
     }
   };
