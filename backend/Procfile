@@ -1,5 +1,0 @@
-# Procfile for AWS Elastic Beanstalk
-# Specifies the command to start the Spring Boot application
-
-web: java -Dserver.port=5000 -Dspring.profiles.active=prod -jar rapid-photo-upload-0.0.1-SNAPSHOT.jar
-
